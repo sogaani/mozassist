@@ -304,7 +304,6 @@ GatewayClient.getSmartHomeDeviceStates = function (client, thing) {
     };
 
     try {
-      let color;
 
       switch (thing.type) {
         case 'onOffSwitch':
@@ -314,34 +313,55 @@ GatewayClient.getSmartHomeDeviceStates = function (client, thing) {
           states['on'] = await GatewayClient.getThingState(client, thing, 'on');
           break;
         case 'dimmableLight':
-          states['on'] = await GatewayClient.getThingState(client, thing, 'on');
-          states['brightness'] = await GatewayClient.getThingState(client, thing, 'level');
+          {
+            const [on, brightness] = await Promise.all([
+              GatewayClient.getThingState(client, thing, 'on'),
+              GatewayClient.getThingState(client, thing, 'level')]);
+
+            states['on'] = on;
+            states['brightness'] = brightness;
+          }
           break;
         case 'onOffColorLight':
-          states['on'] = await GatewayClient.getThingState(client, thing, 'on');
+          {
+            const [on, hex] = await Promise.all([
+              GatewayClient.getThingState(client, thing, 'on'),
+              GatewayClient.getThingState(client, thing, 'color')]);
 
-          color = {
-            spectrumRGB: hex2number(await GatewayClient.getThingState(client, thing, 'color'))
+            states['on'] = on;
+
+            const color = {
+              spectrumRGB: hex2number(hex)
+            };
+            states['color'] = color;
           }
-
-          states['color'] = color;
           break;
         case 'dimmableColorLight':
-          states['on'] = await GatewayClient.getThingState(client, thing, 'on');
-          states['brightness'] = await GatewayClient.getThingState(client, thing, 'level');
+          {
+            const [on, brightness, hex] = await Promise.all([
+              GatewayClient.getThingState(client, thing, 'on'),
+              GatewayClient.getThingState(client, thing, 'level'),
+              GatewayClient.getThingState(client, thing, 'color')]);
 
-          color = {
-            spectrumRGB: hex2number(await GatewayClient.getThingState(client, thing, 'color'))
+            states['on'] = on;
+            states['brightness'] = brightness;
+
+            const color = {
+              spectrumRGB: hex2number(hex)
+            };
+            states['color'] = color;
           }
-
-          states['color'] = color;
           break;
 
         case 'thing':
           // thermostat
           if (thing.properties.hasOwnProperty('mode') && thing.properties.hasOwnProperty('temperature')) {
-            states['thermostatMode'] = await GatewayClient.getThingState(client, thing, 'mode');
-            states['thermostatTemperatureSetpoint'] = await GatewayClient.getThingState(client, thing, 'temperature');
+            const [mode, temperature] = await Promise.all([
+              GatewayClient.getThingState(client, thing, 'mode'),
+              GatewayClient.getThingState(client, thing, 'temperature')
+            ]);
+            states['thermostatMode'] = mode;
+            states['thermostatTemperatureSetpoint'] = temperature;
           }
           break;
         default:
