@@ -11,13 +11,22 @@ const TRAITS_COLORTEMP = 'action.devices.traits.ColorTemperature';
 const TRAITS_TEMPSETTING = 'action.devices.traits.TemperatureSetting';
 
 const fetch = require('node-fetch');
+const https = require('https');
 const util = require('util')
 
 var GatewayClient = {};
 
+let keepAliveAgent = new https.Agent({
+  keepAlive: false,
+  keepAliveMsecs: 1500,
+  maxSockets: 70
+});
+
 const thingsOptions = {
   method: 'GET',
+  agent: keepAliveAgent,
   headers: {
+    'Connection': 'keep-alive',
     'Authorization': '',
     'Accept': 'application/json'
   }
@@ -25,7 +34,9 @@ const thingsOptions = {
 
 const iotOptions = {
   method: 'PUT',
+  agent: keepAliveAgent,
   headers: {
+    'Connection': 'keep-alive',
     'Authorization': '',
     'Accept': 'application/json',
     'Content-Type': 'application/json'
