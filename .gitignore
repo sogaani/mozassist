@@ -1,0 +1,8 @@
+typings/
+config.json
+*.swp
+*.tgz
+*~
+SHA256SUMS
+/node_modules/
+!.gitkeep

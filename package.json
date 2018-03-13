@@ -1,0 +1,31 @@
+{
+  "name": "mozgateway-google-smarthome",
+  "version": "0.1.0",
+  "description": "Google smart Home App for Mozilla IoT Gateway",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js isLocal"
+  },
+  "keywords": [
+    "mozilla",
+    "iot",
+    "adapter",
+    "broadlink"
+  ],
+  "homepage": "https://github.com/sogaani/mozgateway-google-assistant",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sogaani/mozgateway-google-assistant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sogaani/mozgateway-google-assistant/issues"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "morgan": "^1.9.0",
+    "ngrok": "^2.2.26",
+    "node-fetch": "^1.6.3"
+  }
+}
