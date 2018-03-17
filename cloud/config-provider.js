@@ -3,9 +3,8 @@
 var Config = {};
 
 Config.devPortSmartHome = '31338';
-Config.gatewayClientId = 'hello'; // client id that Google will use
-Config.gatewayClientSecret = 'dafD8jraghakjnewuac'; // client secret that Google will use
-Config.gatewayAddress = 'https://hogehoge'
+Config.clientId = 'hello'; // client id that Google will use
+Config.clientSecret = 'dafD8jraghakjnewuac'; // client secret that Google will use
 Config.smartHomeProviderApiKey = '<API_KEY>'; // client API Key generated on the console
 Config.isLocal = false;
 
@@ -29,7 +28,6 @@ init();
 exports.devPortSmartHome = Config.devPortSmartHome;
 exports.smartHomeProviderCloudEndpoint = Config.smartHomeProviderCloudEndpoint;
 exports.smartHomeProviderApiKey = Config.smartHomeProviderApiKey;
-exports.gatewayClientId = Config.gatewayClientId;
-exports.gatewayClientSecret = Config.gatewayClientSecret;
-exports.gatewayAddress = Config.gatewayAddress;
+exports.clientId = Config.clientId;
+exports.clientSecret = Config.clientSecret;
 exports.isLocal = Config.isLocal;

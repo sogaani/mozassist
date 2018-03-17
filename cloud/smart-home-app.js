@@ -74,6 +74,8 @@ if (config.api_key === '<API_KEY>') {
 
 let app = createApp(config);
 
+app.use('/gateway/', express.static(__dirname + '/../static'));
+
 google_ha.registerAgent(app);
 auth.registerAuth(app);
 
