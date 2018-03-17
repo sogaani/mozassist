@@ -3,6 +3,7 @@ config.json
 *.swp
 *.tgz
 *~
-SHA256SUMS
+/static/bower_components
+/static/imports.build.html
 /node_modules/
 !.gitkeep
