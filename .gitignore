@@ -5,5 +5,6 @@ config.json
 *~
 /static/bower_components
 /static/imports.build.html
+/static/build
 /node_modules/
 !.gitkeep

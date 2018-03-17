@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js isLocal",
-    "minify:template": "vulcanize --strip-comments --inline-scripts --inline-css  --strip static/imports.html > static/imports.build.html"
+    "build": "cd static && polymer build"
   },
   "keywords": [
     "mozilla",
@@ -29,6 +29,6 @@
     "morgan": "^1.9.0",
     "ngrok": "^2.2.26",
     "node-fetch": "^1.6.3",
-    "vulcanize": "^1.16.0"
+    "polymer-cli": "^1.6.0"
   }
 }

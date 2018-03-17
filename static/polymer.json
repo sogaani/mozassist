@@ -1,0 +1,32 @@
+{
+  "entrypoint": "index.html",
+  "fragments": [],
+  "sources": [
+    "imports.html"
+  ],
+  "builds": [
+    {
+      "bundle": {
+        "inlineCss": true,
+        "inlineScripts": true,
+        "rewriteUrlsInTemplates": false,
+        "stripComments": true,
+        "sourcemaps": true
+      },
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      }
+    }
+  ],
+  "lint": {
+    "rules": [
+      "polymer-2"
+    ]
+  }
+}
