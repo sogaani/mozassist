@@ -1,0 +1,23 @@
+{
+  "name": "google home with mozilla gateway",
+  "homepage": "https://github.com/sogaani/mozgateway-google-assistant",
+  "authors": [
+    "sogaani <soga.ani@gmail.com>"
+  ],
+  "description": "google home with mozilla gateway",
+  "main": "index.html",
+  "license": "MPL-2.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-button": "^2.1.0",
+    "paper-input": "^2.2.0",
+    "webcomponentsjs": "^1.1.0"
+  }
+}

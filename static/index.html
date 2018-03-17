@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+	<title>Google Home with Mozilla Gateway</title>
+	<meta name="description" content="Google Home with Mozilla Gateway">
+
+	<link rel="icon" href="images/favicon.ico">
+
+	<!-- login -->
+	<meta name="google-signin-scope" content="profile email">
+
+	<script>
+		const SMART_HOME_PROVIDER_CLOUD_ENDPOINT = '/smart-home-api';
+
+		// Setup Polymer options
+		window.Polymer = {
+			dom: 'shadow',
+			lazyRegister: true
+		};
+
+		// Load webcomponentsjs polyfill if browser does not support native Web Components
+		(function () {
+			'use strict';
+
+			var onload = function () {
+				// For native Imports, manually fire WebComponentsReady so user code
+				// can use the same code path for native and polyfill'd imports.
+				if (!window.HTMLImports) {
+					document.dispatchEvent(
+						new CustomEvent('WebComponentsReady', { bubbles: true })
+					);
+				}
+			};
+
+			var webComponentsSupported = (
+				'registerElement' in document
+				&& 'import' in document.createElement('link')
+				&& 'content' in document.createElement('template')
+			);
+
+			if (!webComponentsSupported) {
+				var script = document.createElement('script');
+				script.async = true;
+				script.src = 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
+				script.onload = onload;
+				document.head.appendChild(script);
+			} else {
+				onload();
+			}
+		})();
+
+	</script>
+
+	<link rel="import" href="imports.build.html">
+
+	<style>
+		body {
+			margin: 0;
+			font-family: 'Roboto', 'Noto', sans-serif;
+			line-height: 1.5;
+			min-height: 100vh;
+			background-color: #fafafa;
+		}
+
+		div.main {
+			margin-left: auto;
+			margin-right: auto;
+			width: 100%;
+		}
+
+		div.main>h1 {
+			text-align: center;
+			color: #333;
+		}
+
+		paper-input {
+			width: calc(100% - 40px);
+			margin-left: 20px;
+			text-align: left;
+		}
+
+		paper-input iron-icon {
+			margin-right: 16px;
+			color: #555;
+		}
+
+		paper-button {
+			margin-left: 20px;
+			margin-top: 40px;
+			color: white;
+			background-color: #085181;
+		}
+
+		@media (max-width:800px) {
+			div.main>h1 {
+				font-size: 16pt;
+			}
+		}
+
+		@media (min-width:800px) {
+			div.main {
+				width: 600px;
+			}
+			paper-input {
+				margin-left: 80px;
+			}
+			paper-button {
+				margin-left: 80px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class='main'>
+		<h1>Connect your Mozilla Gateway</h1>
+
+
+		<form action='/gateway/oauth' method='get' id='connectform'>
+			<paper-input always-float-label label="Domain" name="paper_gateway_domain">
+				<div slot="suffix">.mozilla-iot.org</div>
+			</paper-input>
+			<paper-input always-float-label label="Client Id" name="paper_gateway_client_id">
+			</paper-input>
+			<paper-input always-float-label label="Client Secret" type="password" name="paper_gateway_client_secret">
+				<iron-icon icon="communication:vpn-key" slot="suffix"></iron-icon>
+			</paper-input>
+
+			<paper-button raised onclick="formSubmit()">Connect</paper-button>
+
+			<input type="hidden" name="domain">
+			<input type="hidden" name="client_id">
+			<input type="hidden" name="client_secret">
+			<input type="hidden" name="redirect_uri">
+			<input type="hidden" name="state">
+			<input type="hidden" name="response_type">
+			<input type="hidden" name="scope">
+
+		</form>
+	</div>
+
+	<script>
+		function getUrlParameters() {
+			// Get each parameter
+			const query = window.location.search.substr(1);
+			// Split each parameter into a key-value pair
+			const keyValues = query.split('&');
+			const parameterMap = new Map();
+			for (let i in keyValues) {
+				// Split into <key>=<value>
+				let param = keyValues[i];
+				let splitParam = param.split('=');
+				parameterMap.set(splitParam[0], decodeURIComponent(splitParam[1]));
+			}
+			return parameterMap;
+		}
+
+		function formSubmit() {
+			// Get URL parameters
+			const params = getUrlParameters();
+			// Set each hidden input from a value obtained from the URL
+			document.querySelector('[name="domain"]').value = document.querySelector('paper-input[name="paper_gateway_domain"]').value;
+			document.querySelector('[name="client_id"]').value = document.querySelector('paper-input[name="paper_gateway_client_id"]').value;
+			document.querySelector('[name="client_secret"]').value = document.querySelector('paper-input[name="paper_gateway_client_secret"]').value;
+			document.querySelector('[name="redirect_uri"]').value = params.get('redirect_uri');
+			document.querySelector('[name="state"]').value = params.get('state');
+			document.querySelector('[name="response_type"]').value = params.get('response_type');
+			document.querySelector('[name="scope"]').value = params.get('scope');
+			document.querySelector('#connectform').submit();
+		}
+	</script>
+</body>
+
+</html>
