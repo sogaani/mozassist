@@ -73,7 +73,6 @@ class Database {
     return docsnap.data();
   }
 
-
   /**
    * Set a gateway with key oauth token.
    *

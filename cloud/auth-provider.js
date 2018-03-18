@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 //const oauthClients = require('../../src/models/oauthclients');
 const config = require('./config-provider');
 const datastore = require('./datastore');
+const url = require('url');
 
 datastore.open();
 
@@ -39,11 +40,18 @@ Auth.registerAuth = function (app) {
       return res.status(400).send('incorrect client data');
     }
 
-    let url = util.format('/gateway?redirect_uri=%s&response_type=%s&state=%s&scope=%s',
-      encodeURIComponent(redirect_uri), response_type, state, scope);
+    let inputFormUrl = url.format({
+      pathname: '/gateway',
+      query   : {
+        redirect_uri : redirect_uri,
+        response_type: response_type,
+        state        : state,
+        scope        : scope
+      }
+    });
 
     // 2. User inputs Mozilla Gateway infomation.
-    return res.redirect(url);
+    return res.redirect(inputFormUrl);
   });
 
   // 3. Redirect to Mozilla Gateway to delegate authentication.
@@ -60,18 +68,26 @@ Auth.registerAuth = function (app) {
       return res.status(500).send('response_type ' + response_type + ' must equal "code"');
 
     const client = {
-      gateway: `https://${domain}.mozilla-iot.org`,
-      client_id: client_id,
+      gateway      : `https://${domain}.mozilla-iot.org`,
+      client_id    : client_id,
       client_secret: client_secret,
-      redirect_uri: redirect_uri
+      redirect_uri : redirect_uri
     };
 
     await datastore.registerGatewayWithState(state, client);
 
-    let gatewayUrl = util.format('%s/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=%s&state=%s&scope=%s',
-      client.gateway, client.client_id, encodeURIComponent(`https://${req.hostname}/allow`), response_type, state, scope
-    );
+    let gatewayUrl = url.format({
+      pathname: client.gateway + '/oauth/authorize',
+      query   : {
+        client_id    : client.client_id,
+        redirect_uri : `https://${req.hostname}/allow`,
+        response_type: response_type,
+        state        : state,
+        scope        : scope
+      }
+    });
 
+    console.log(gatewayUrl);
     return res.redirect(gatewayUrl);
   });
 
@@ -92,9 +108,13 @@ Auth.registerAuth = function (app) {
 
     await datastore.registerGatewayWithState(code, client);
 
-    let gatewayUrl = util.format('%s?state=%s&code=%s',
-      client.redirect_uri, state, code
-    );
+    let gatewayUrl = url.format({
+      pathname: client.redirect_uri,
+      query   : {
+        state: state,
+        code : code
+      }
+    });
 
     return res.redirect(gatewayUrl);
   });
@@ -129,9 +149,9 @@ Auth.registerAuth = function (app) {
 
     if ('authorization_code' == grant_type) {
       const options = {
-        method: 'POST',
+        method : 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type' : 'application/x-www-form-urlencoded',
           'authorization': 'Basic ' + userPassB64,
         },
         body: `code=${code}&` +
@@ -163,7 +183,8 @@ Auth.registerAuth = function (app) {
 
     } else {
       console.error('grant_type ' + grant_type + ' is not supported');
-      return res.status(400).send('grant_type ' + grant_type + ' is not supported');
+      res.status(400).send('grant_type ' + grant_type + ' is not supported');
+      return;
     }
   });
 };

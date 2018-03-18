@@ -2,15 +2,13 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
 const morgan = require('morgan');
-const ngrok = require('ngrok');
+//const ngrok = require('ngrok');
 const session = require('express-session');
 
 // internal app deps
 const google_ha = require('./smart-home-provider');
 const auth = require('./auth-provider');
-const homeGraph = require('./home-graph');
 const config = require('./config-provider');
 
 process.on('unhandledRejection', console.dir);
@@ -22,11 +20,11 @@ function createApp(config) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.set('trust proxy', 1);
   app.use(session({
-    name: '__session',
-    secret: 'xyzsecret',
-    resave: false,
+    name             : '__session',
+    secret           : 'xyzsecret',
+    resave           : false,
     saveUninitialized: true,
-    cookie: { secure: false }
+    cookie           : { secure: false }
   }));
 
   // !firebase functions
@@ -60,16 +58,6 @@ function createApp(config) {
   }
 
   return app;
-}
-
-
-// Check that the API key was changed from the default
-if (config.api_key === '<API_KEY>') {
-  errorCallback(name, 'You need to set the API key in config.\n' +
-    'Visit the Google Cloud Console to generate an API key for your project.\n' +
-    'https://console.cloud.google.com\n' +
-    'Exiting...');
-  return;
 }
 
 let app = createApp(config);

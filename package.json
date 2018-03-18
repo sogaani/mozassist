@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js isLocal",
-    "build": "cd static && polymer build"
+    "build": "npm run lint && npm run minfy",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "minfy": "cd static && polymer build"
   },
   "keywords": [
     "mozilla",
@@ -31,5 +34,10 @@
     "ngrok": "^2.2.26",
     "node-fetch": "^1.6.3",
     "polymer-cli": "^1.6.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "eslint": "^4.19.0",
+    "eslint-plugin-html": "^4.0.2"
   }
 }
