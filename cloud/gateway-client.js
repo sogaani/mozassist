@@ -14,8 +14,6 @@ const fetch = require('node-fetch');
 const https = require('https');
 const util = require('util');
 
-var GatewayClient = {};
-
 const keepAliveAgent = new https.Agent({
   keepAlive     : false,
   keepAliveMsecs: 1500,
@@ -58,7 +56,7 @@ function number2hex(colorNumber) {
   return color;
 }
 
-GatewayClient.getThing = async function(client, id) {
+async function getThing(client, id) {
   thingsOptions.headers.Authorization = 'Bearer ' + client.token;
 
   const thingUrl = util.format('%s/things/%s', client.gateway, id);
@@ -72,9 +70,9 @@ GatewayClient.getThing = async function(client, id) {
     console.log(err);
     throw new Error(`getThing failed url:${thingUrl}`);
   }
-};
+}
 
-GatewayClient.getThings = async function(client, deviceList) {
+async function getThings(client, deviceList) {
   thingsOptions.headers.Authorization = 'Bearer ' + client.token;
 
   const thingsUrl = util.format('%s/things', client.gateway);
@@ -87,7 +85,7 @@ GatewayClient.getThings = async function(client, deviceList) {
     if (deviceList) {
       for (let i = 0; i < json.length; i++) {
         const thing = json[i];
-        const thingId = GatewayClient.getThingId(thing);
+        const thingId = getThingId(thing);
         if (deviceList.includes(thingId)) {
           things.push(thing);
         }
@@ -101,9 +99,9 @@ GatewayClient.getThings = async function(client, deviceList) {
     console.log(err);
     throw new Error(`getThings failed url:${thingsUrl}`);
   }
-};
+}
 
-GatewayClient.getThingState = async function(client, thing, property) {
+async function getThingState(client, thing, property) {
   if (!thing || !thing.properties || !thing.properties[property]) {
     throw new Error('thing dose not have property: ' + property);
   }
@@ -122,9 +120,9 @@ GatewayClient.getThingState = async function(client, thing, property) {
     console.log(err);
     throw new Error(`getThingState failed url:${propertyUrl}`);
   }
-};
+}
 
-GatewayClient.setThingState = async function(client, thing, property, state) {
+async function setThingState(client, thing, property, state) {
   if (!thing || !thing.properties || !thing.properties[property]) {
     throw new Error('thing dose not have property: ' + property);
   }
@@ -148,9 +146,9 @@ GatewayClient.setThingState = async function(client, thing, property, state) {
     console.log(err);
     throw new Error(`setThingState failed url:${propertyUrl}`);
   }
-};
+}
 
-GatewayClient.getSmartHomeDeviceProperties = function(thing) {
+function getSmartHomeDeviceProperties(thing) {
   const device = {
     id    : null,
     type  : null,
@@ -216,9 +214,9 @@ GatewayClient.getSmartHomeDeviceProperties = function(thing) {
   }
 
   return device;
-};
+}
 
-GatewayClient.changeSmartHomeDeviceStates = async function(client, thing, states) {
+async function changeSmartHomeDeviceStates(client, thing, states) {
   try {
     switch (thing.type) {
     case 'onOffSwitch':
@@ -226,49 +224,49 @@ GatewayClient.changeSmartHomeDeviceStates = async function(client, thing, states
     case 'smartPlug': // limitation: only support on property
     case 'onOffLight':
       if (states.hasOwnProperty('on'))
-        await GatewayClient.setThingState(client, thing, 'on', states['on']);
+        await setThingState(client, thing, 'on', states['on']);
 
       break;
 
     case 'dimmableLight':
       if (states.hasOwnProperty('on'))
-        await GatewayClient.setThingState(client, thing, 'on', states['on']);
+        await setThingState(client, thing, 'on', states['on']);
 
       if (states.hasOwnProperty('brightness'))
-        await GatewayClient.setThingState(client, thing, 'level', states['brightness']);
+        await setThingState(client, thing, 'level', states['brightness']);
 
       if (states.hasOwnProperty('brightnessRelativeWeight')) {
-        const current = await GatewayClient.getThingState(client, thing, 'level');
+        const current = await getThingState(client, thing, 'level');
         const target = current + states['brightnessRelativeWeight'];
-        await GatewayClient.setThingState(client, thing, 'level', target);
+        await setThingState(client, thing, 'level', target);
       }
       break;
 
     case 'onOffColorLight':
       if (states.hasOwnProperty('on'))
-        await GatewayClient.setThingState(client, thing, 'on', states['on']);
+        await setThingState(client, thing, 'on', states['on']);
 
       if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
         const color = number2hex(states['color'].spectrumRGB);
-        await GatewayClient.setThingState(client, thing, 'color', color);
+        await setThingState(client, thing, 'color', color);
       }
       break;
 
     case 'dimmableColorLight':
       if (states.hasOwnProperty('on'))
-        await GatewayClient.setThingState(client, thing, 'on', states['on']);
+        await setThingState(client, thing, 'on', states['on']);
 
       if (states.hasOwnProperty('brightness'))
-        await GatewayClient.setThingState(client, thing, 'level', states['brightness']);
+        await setThingState(client, thing, 'level', states['brightness']);
 
       if (states.hasOwnProperty('brightnessRelativeWeight')) {
-        const current = await GatewayClient.getThingState(client, thing, 'level');
+        const current = await getThingState(client, thing, 'level');
         const target = current + states['brightnessRelativeWeight'];
-        await GatewayClient.setThingState(client, thing, 'level', target);
+        await setThingState(client, thing, 'level', target);
       }
       if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
         const color = number2hex(states['color'].spectrumRGB);
-        await GatewayClient.setThingState(client, thing, 'color', color);
+        await setThingState(client, thing, 'color', color);
       }
       break;
 
@@ -277,11 +275,11 @@ GatewayClient.changeSmartHomeDeviceStates = async function(client, thing, states
       if (thing.properties.hasOwnProperty('mode') &&
             thing.properties.hasOwnProperty('temperature')) {
         if (states.hasOwnProperty('thermostatMode'))
-          await GatewayClient.setThingState(client, thing, 'mode', states['thermostatMode']);
+          await setThingState(client, thing, 'mode', states['thermostatMode']);
 
         if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
           const temperature = states['thermostatTemperatureSetpoint'];
-          await GatewayClient.setThingState(client, thing, 'temperature', temperature);
+          await setThingState(client, thing, 'temperature', temperature);
         }
       }
       break;
@@ -295,9 +293,9 @@ GatewayClient.changeSmartHomeDeviceStates = async function(client, thing, states
   }
 
   return states;
-};
+}
 
-GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
+async function getSmartHomeDeviceStates(client, thing) {
   const states = {
     online: true,
   };
@@ -308,13 +306,13 @@ GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
     case 'multilevelSwitch': // limitation: only support on property
     case 'smartPlug': // limitation: only support on property
     case 'onOffLight':
-      states['on'] = await GatewayClient.getThingState(client, thing, 'on');
+      states['on'] = await getThingState(client, thing, 'on');
       break;
     case 'dimmableLight':
       {
         const [on, brightness] = await Promise.all([
-          GatewayClient.getThingState(client, thing, 'on'),
-          GatewayClient.getThingState(client, thing, 'level')]);
+          getThingState(client, thing, 'on'),
+          getThingState(client, thing, 'level')]);
 
         states['on'] = on;
         states['brightness'] = brightness;
@@ -323,8 +321,8 @@ GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
     case 'onOffColorLight':
       {
         const [on, hex] = await Promise.all([
-          GatewayClient.getThingState(client, thing, 'on'),
-          GatewayClient.getThingState(client, thing, 'color')]);
+          getThingState(client, thing, 'on'),
+          getThingState(client, thing, 'color')]);
 
         states['on'] = on;
 
@@ -337,9 +335,9 @@ GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
     case 'dimmableColorLight':
       {
         const [on, brightness, hex] = await Promise.all([
-          GatewayClient.getThingState(client, thing, 'on'),
-          GatewayClient.getThingState(client, thing, 'level'),
-          GatewayClient.getThingState(client, thing, 'color'),
+          getThingState(client, thing, 'on'),
+          getThingState(client, thing, 'level'),
+          getThingState(client, thing, 'color'),
         ]);
 
         states['on'] = on;
@@ -357,8 +355,8 @@ GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
       if (thing.properties.hasOwnProperty('mode') &&
           thing.properties.hasOwnProperty('temperature')) {
         const [mode, temperature] = await Promise.all([
-          GatewayClient.getThingState(client, thing, 'mode'),
-          GatewayClient.getThingState(client, thing, 'temperature'),
+          getThingState(client, thing, 'mode'),
+          getThingState(client, thing, 'temperature'),
         ]);
 
         states['thermostatMode'] = mode;
@@ -375,12 +373,12 @@ GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
   }
 
   return states;
-};
+}
 
-GatewayClient.getThingId = function(thing) {
+function getThingId(thing) {
   const href = thing.href;
   return href.slice(href.lastIndexOf('/') + 1);
-};
+}
 
 /**
  *
@@ -457,21 +455,21 @@ GatewayClient.getThingId = function(thing) {
  *   }
  * }
  */
-GatewayClient.smartHomeGetDevices = async function(client, deviceList = null) {
-  const things = await GatewayClient.getThings(client, deviceList);
+async function smartHomeGetDevices(client, deviceList = null) {
+  const things = await getThings(client, deviceList);
   const devices = {};
   for (let i = 0; i < things.length; i++) {
     const thing = things[i];
-    const device = GatewayClient.getSmartHomeDeviceProperties(thing);
+    const device = getSmartHomeDeviceProperties(thing);
 
     if (device && device.type) {
-      const thingId = GatewayClient.getThingId(thing);
+      const thingId = getThingId(thing);
       devices[thingId] = device;
     }
   }
 
   return devices;
-};
+}
 
 /**
  *
@@ -498,24 +496,24 @@ GatewayClient.smartHomeGetDevices = async function(client, deviceList = null) {
  *   ...
  * }
  */
-GatewayClient.smartHomeGetStates = async function(client, deviceList = null) {
-  const things = await GatewayClient.getThings(client, deviceList);
+async function smartHomeGetStates(client, deviceList = null) {
+  const things = await getThings(client, deviceList);
 
   const results = await Promise.all(things.map(function(thing) {
-    return GatewayClient.getSmartHomeDeviceStates(client, thing);
+    return getSmartHomeDeviceStates(client, thing);
   }));
 
   const devices = {};
 
   for (let i = 0; i < results.length; i++) {
     const thing = things[i];
-    const thingId = GatewayClient.getThingId(thing);
+    const thingId = getThingId(thing);
     const states = results[i];
     devices[thingId] = states;
   }
 
   return devices;
-};
+}
 
 /**
  *
@@ -538,8 +536,8 @@ GatewayClient.smartHomeGetStates = async function(client, deviceList = null) {
  *   "on": true
  * }
  */
-GatewayClient.smartHomeExec = async function(client, deviceList, exec) {
-  const things = await GatewayClient.getThings(client, deviceList);
+async function smartHomeExec(client, deviceList, exec) {
+  const things = await getThings(client, deviceList);
 
   let states = {};
 
@@ -548,13 +546,13 @@ GatewayClient.smartHomeExec = async function(client, deviceList, exec) {
   }
 
   await Promise.all(things.map(function(thing) {
-    return GatewayClient.changeSmartHomeDeviceStates(client, thing, states);
+    return changeSmartHomeDeviceStates(client, thing, states);
   }));
 
   // TODO return current states
   return states;
-};
+}
 
-exports.smartHomeGetDevices = GatewayClient.smartHomeGetDevices;
-exports.smartHomeGetStates = GatewayClient.smartHomeGetStates;
-exports.smartHomeExec = GatewayClient.smartHomeExec;
+exports.smartHomeGetDevices = smartHomeGetDevices;
+exports.smartHomeGetStates = smartHomeGetStates;
+exports.smartHomeExec = smartHomeExec;

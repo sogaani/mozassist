@@ -2,7 +2,6 @@
 
 const util = require('util');
 const fetch = require('node-fetch');
-// const oauthClients = require('../../src/models/oauthclients');
 const config = require('./config-provider');
 const datastore = require('./datastore');
 const url = require('url');
@@ -10,20 +9,17 @@ const {requestSync} = require('./home-graph');
 
 datastore.open();
 
-var Auth = {};
-var GatewayModel = {};
-
 const DEBUG = true;
 
-GatewayModel.gatewayToId = function(gateway) {
+function gatewayToId(gateway) {
   return new Buffer(gateway).toString('base64');
-};
+}
 
-Auth.getAccessToken = function(request) {
+function getAccessToken(request) {
   return request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-};
+}
 
-Auth.registerAuth = function(app) {
+function registerAuth(app) {
   // 1. Assistant App try to be authorized.
   app.get('/oauth', function(req, res) {
     const client_id = req.query.client_id;
@@ -179,7 +175,7 @@ Auth.registerAuth = function(app) {
 
       await datastore.registerGatewayWithToken(token, client);
 
-      setTimeout(requestSync, 2000, GatewayModel.gatewayToId(client.gateway));
+      setTimeout(requestSync, 2000, gatewayToId(client.gateway));
 
       return res.json(json);
     } catch (err) {
@@ -187,8 +183,8 @@ Auth.registerAuth = function(app) {
       return res.status(500).send('Internal Server Error');
     }
   });
-};
+}
 
-exports.registerAuth = Auth.registerAuth;
-exports.getAccessToken = Auth.getAccessToken;
-exports.gatewayToId = GatewayModel.gatewayToId;
+exports.registerAuth = registerAuth;
+exports.getAccessToken = getAccessToken;
+exports.gatewayToId = gatewayToId;
