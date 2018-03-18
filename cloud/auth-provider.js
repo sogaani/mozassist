@@ -16,7 +16,7 @@ GatewayModel.registerClient = function (key, client) {
 }
 
 GatewayModel.gatewayToId = function (gateway) {
-  return 'faiojrghakahge431f'//return new Buffer(gateway).toString('base64');
+  return new Buffer(gateway).toString('base64');
 }
 
 GatewayModel.getClient = function (key) {
