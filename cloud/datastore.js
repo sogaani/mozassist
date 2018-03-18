@@ -13,7 +13,7 @@ class Database {
   /**
    * Firestore object.
    */
-  //static db = null;;
+  // static db = null;;
 
   /**
    * Open the database.
@@ -25,7 +25,7 @@ class Database {
     }
 
     Admin.initializeApp({
-      credential: Admin.credential.cert(config.googleServiceAccount)
+      credential: Admin.credential.cert(config.googleServiceAccount),
     });
 
     this.db = Admin.firestore();
@@ -118,7 +118,6 @@ class Database {
     const collection = this.db.collection(OAUTH_COLLECTION);
     return this.getGateway(collection, state);
   }
-
 }
 
 module.exports = Database;

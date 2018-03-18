@@ -25,9 +25,9 @@ function registerAgent(app) {
    *   }
    * }
    */
-  app.post('/smarthome', async function (request, response) {
-    let reqdata = request.body;
-    let authToken = auth.getAccessToken(request);
+  app.post('/smarthome', async function(request, response) {
+    const reqdata = request.body;
+    const authToken = auth.getAccessToken(request);
 
     DEBUG && console.log('smarthome', reqdata);
 
@@ -36,12 +36,12 @@ function registerAgent(app) {
     if (!client) {
       response.status(403).set({
         'Access-Control-Allow-Origin' : '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       }).json({
         requestId: reqdata.requestId,
         payload  : {
-          errorCode: 'authExpired'
-        }
+          errorCode: 'authExpired',
+        },
       });
       return;
     }
@@ -49,130 +49,129 @@ function registerAgent(app) {
     if (!reqdata.inputs) {
       response.status(401).set({
         'Access-Control-Allow-Origin' : '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      }).json({ error: 'missing inputs' });
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }).json({error: 'missing inputs'});
       return;
     }
 
     for (let i = 0; i < reqdata.inputs.length; i++) {
-      let input = reqdata.inputs[i];
-      let intent = input.intent;
+      const input = reqdata.inputs[i];
+      const intent = input.intent;
       if (!intent) {
         response.status(401).set({
           'Access-Control-Allow-Origin' : '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        }).json({ error: 'missing inputs' });
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }).json({error: 'missing inputs'});
         continue;
       }
       switch (intent) {
       case 'action.devices.SYNC':
         DEBUG && console.log('post /smarthome SYNC');
         /**
-                             * request:
-                             * {
-                             *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                             *  "inputs": [{
-                             *      "intent": "action.devices.SYNC",
-                             *  }]
-                             * }
-                             */
+                               * request:
+                               * {
+                               *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                               *  "inputs": [{
+                               *      "intent": "action.devices.SYNC",
+                               *  }]
+                               * }
+                               */
         sync(client, {
-          requestId: reqdata.requestId
+          requestId: reqdata.requestId,
         }, response);
         break;
       case 'action.devices.QUERY':
         DEBUG && console.log('post /smarthome QUERY');
         /**
-                             * request:
-                             * {
-                             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                             *   "inputs": [{
-                             *       "intent": "action.devices.QUERY",
-                             *       "payload": {
-                             *          "devices": [{
-                             *            "id": "123",
-                             *            "customData": {
-                             *              "fooValue": 12,
-                             *              "barValue": true,
-                             *              "bazValue": "alpaca sauce"
-                             *            }
-                             *          }, {
-                             *            "id": "234",
-                             *            "customData": {
-                             *              "fooValue": 74,
-                             *              "barValue": false,
-                             *              "bazValue": "sheep dip"
-                             *            }
-                             *          }]
-                             *       }
-                             *   }]
-                             * }
-                             */
+                               * request:
+                               * {
+                               *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                               *   "inputs": [{
+                               *       "intent": "action.devices.QUERY",
+                               *       "payload": {
+                               *          "devices": [{
+                               *            "id": "123",
+                               *            "customData": {
+                               *              "fooValue": 12,
+                               *              "barValue": true,
+                               *              "bazValue": "alpaca sauce"
+                               *            }
+                               *          }, {
+                               *            "id": "234",
+                               *            "customData": {
+                               *              "fooValue": 74,
+                               *              "barValue": false,
+                               *              "bazValue": "sheep dip"
+                               *            }
+                               *          }]
+                               *       }
+                               *   }]
+                               * }
+                               */
         query(client, {
           requestId: reqdata.requestId,
-          devices  : reqdata.inputs[0].payload.devices
+          devices  : reqdata.inputs[0].payload.devices,
         }, response);
 
         break;
       case 'action.devices.EXECUTE':
         DEBUG && console.log('post /smarthome EXECUTE');
         /**
-                             * request:
-                             * {
-                             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                             *   "inputs": [{
-                             *     "intent": "action.devices.EXECUTE",
-                             *     "payload": {
-                             *       "commands": [{
-                             *         "devices": [{
-                             *           "id": "123",
-                             *           "customData": {
-                             *             "fooValue": 12,
-                             *             "barValue": true,
-                             *             "bazValue": "alpaca sauce"
-                             *           }
-                             *         }, {
-                             *           "id": "234",
-                             *           "customData": {
-                             *              "fooValue": 74,
-                             *              "barValue": false,
-                             *              "bazValue": "sheep dip"
-                             *           }
-                             *         }],
-                             *         "execution": [{
-                             *           "command": "action.devices.commands.OnOff",
-                             *           "params": {
-                             *             "on": true
-                             *           }
-                             *         }]
-                             *       }]
-                             *     }
-                             *   }]
-                             * }
-                             */
+                               * request:
+                               * {
+                               *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                               *   "inputs": [{
+                               *     "intent": "action.devices.EXECUTE",
+                               *     "payload": {
+                               *       "commands": [{
+                               *         "devices": [{
+                               *           "id": "123",
+                               *           "customData": {
+                               *             "fooValue": 12,
+                               *             "barValue": true,
+                               *             "bazValue": "alpaca sauce"
+                               *           }
+                               *         }, {
+                               *           "id": "234",
+                               *           "customData": {
+                               *              "fooValue": 74,
+                               *              "barValue": false,
+                               *              "bazValue": "sheep dip"
+                               *           }
+                               *         }],
+                               *         "execution": [{
+                               *           "command": "action.devices.commands.OnOff",
+                               *           "params": {
+                               *             "on": true
+                               *           }
+                               *         }]
+                               *       }]
+                               *     }
+                               *   }]
+                               * }
+                               */
         exec(client, {
           requestId: reqdata.requestId,
-          commands : reqdata.inputs[0].payload.commands
+          commands : reqdata.inputs[0].payload.commands,
         }, response);
 
         break;
       default:
         response.status(401).set({
           'Access-Control-Allow-Origin' : '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        }).json({ error: 'missing intent' });
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }).json({error: 'missing intent'});
         break;
       }
     }
-
   });
   /**
    * Enables prelight (OPTIONS) requests made cross-domain.
    */
-  app.options('/smarthome', function (request, response) {
+  app.options('/smarthome', function(request, response) {
     response.status(200).set({
       'Access-Control-Allow-Origin' : '*',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     }).send('null');
   });
 
@@ -259,29 +258,29 @@ function registerAgent(app) {
     if (!devices) {
       response.status(500).set({
         'Access-Control-Allow-Origin' : '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      }).json({ error: 'failed' });
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }).json({error: 'failed'});
       return;
     }
 
-    let deviceList = [];
+    const deviceList = [];
 
-    Object.keys(devices).forEach(function (key) {
+    Object.keys(devices).forEach(function(key) {
       if (devices.hasOwnProperty(key) && devices[key]) {
         DEBUG && console.log('Getting device information for id \'' + key + '\'');
 
-        let device = devices[key];
+        const device = devices[key];
         device.id = key;
         deviceList.push(device);
       }
     });
 
-    let deviceProps = {
+    const deviceProps = {
       requestId: data.requestId,
       payload  : {
         agentUserId: auth.gatewayToId(client.gateway),
-        devices    : deviceList
-      }
+        devices    : deviceList,
+      },
     };
 
     DEBUG && console.log('sync response', JSON.stringify(deviceProps, undefined, 1));
@@ -334,22 +333,22 @@ function registerAgent(app) {
   async function query(client, data, response) {
     DEBUG && console.log('query', JSON.stringify(data));
 
-    let deviceIds = getDeviceIds(data.devices);
+    const deviceIds = getDeviceIds(data.devices);
 
     const devices = await gatewayClient.smartHomeGetStates(client, deviceIds);
     if (!devices) {
       response.status(500).set({
         'Access-Control-Allow-Origin' : '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      }).json({ error: 'failed' });
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }).json({error: 'failed'});
       return;
     }
 
-    let deviceStates = {
+    const deviceStates = {
       requestId: data.requestId,
       payload  : {
-        devices: devices
-      }
+        devices: devices,
+      },
     };
 
     DEBUG && console.log('query response', JSON.stringify(deviceStates));
@@ -368,13 +367,13 @@ function registerAgent(app) {
    * @return {Array} ["123", "234"]
    */
   function getDeviceIds(devices) {
-    return devices.map(function (device) {
+    return devices.map(function(device) {
       return device.id;
     });
   }
 
   /**
-   * 
+   *
    * @param client
    * @param data:
    * {
@@ -440,21 +439,20 @@ function registerAgent(app) {
   async function exec(client, data, response) {
     DEBUG && console.log('exec', JSON.stringify(data));
 
-    const promises = data.commands.map(function (curCommand) {
+    const promises = data.commands.map(function(curCommand) {
       const deviceIds = getDeviceIds(curCommand.devices);
       const exec = curCommand.execution;
 
       return new Promise(async (resolve) => {
         try {
-          const states = await gatewayClient.smartHomeExec(client, deviceIds, exec)
+          const states = await gatewayClient.smartHomeExec(client, deviceIds, exec);
 
           resolve({
             ids      : deviceIds,
             status   : 'SUCCESS',
             states   : states,
-            errorCode: undefined
+            errorCode: undefined,
           });
-
         } catch (error) {
           console.error(error);
 
@@ -462,9 +460,9 @@ function registerAgent(app) {
             ids   : deviceIds,
             status: 'OFFLINE',
             states: {
-              online: false
+              online: false,
             },
-            errorCode: error
+            errorCode: error,
           });
         }
       });
@@ -475,8 +473,8 @@ function registerAgent(app) {
     const resBody = {
       requestId: data.requestId,
       payload  : {
-        commands: respCommands
-      }
+        commands: respCommands,
+      },
     };
 
     DEBUG && console.log('exec response', JSON.stringify(resBody));

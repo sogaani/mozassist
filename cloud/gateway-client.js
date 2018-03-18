@@ -12,14 +12,14 @@ const TRAITS_TEMPSETTING = 'action.devices.traits.TemperatureSetting';
 
 const fetch = require('node-fetch');
 const https = require('https');
-const util = require('util')
+const util = require('util');
 
 var GatewayClient = {};
 
-let keepAliveAgent = new https.Agent({
+const keepAliveAgent = new https.Agent({
   keepAlive     : false,
   keepAliveMsecs: 1500,
-  maxSockets    : 70
+  maxSockets    : 70,
 });
 
 const thingsOptions = {
@@ -28,8 +28,8 @@ const thingsOptions = {
   headers: {
     'Connection'   : 'keep-alive',
     'Authorization': '',
-    'Accept'       : 'application/json'
-  }
+    'Accept'       : 'application/json',
+  },
 };
 
 const iotOptions = {
@@ -39,14 +39,14 @@ const iotOptions = {
     'Connection'   : 'keep-alive',
     'Authorization': '',
     'Accept'       : 'application/json',
-    'Content-Type' : 'application/json'
+    'Content-Type' : 'application/json',
   },
-  body: ''
+  body: '',
 };
 
 function hex2number(colorString) {
   const color = colorString.replace('#', '');
-  let colorN = parseInt(color, 16);
+  const colorN = parseInt(color, 16);
   return colorN;
 }
 
@@ -58,8 +58,7 @@ function number2hex(colorNumber) {
   return color;
 }
 
-GatewayClient.getThing = async function (client, id) {
-
+GatewayClient.getThing = async function(client, id) {
   thingsOptions.headers.Authorization = 'Bearer ' + client.token;
 
   const thingUrl = util.format('%s/things/%s', client.gateway, id);
@@ -68,20 +67,19 @@ GatewayClient.getThing = async function (client, id) {
 
     const json = await res.json();
 
-    return json
+    return json;
   } catch (err) {
     console.log(err);
     throw new Error(`getThing failed url:${thingUrl}`);
   }
-}
+};
 
-GatewayClient.getThings = async function (client, deviceList) {
-
+GatewayClient.getThings = async function(client, deviceList) {
   thingsOptions.headers.Authorization = 'Bearer ' + client.token;
 
   const thingsUrl = util.format('%s/things', client.gateway);
   try {
-    const res = await fetch(thingsUrl, thingsOptions)
+    const res = await fetch(thingsUrl, thingsOptions);
 
     const json = await res.json();
 
@@ -103,10 +101,9 @@ GatewayClient.getThings = async function (client, deviceList) {
     console.log(err);
     throw new Error(`getThings failed url:${thingsUrl}`);
   }
-}
+};
 
-GatewayClient.getThingState = async function (client, thing, property) {
-
+GatewayClient.getThingState = async function(client, thing, property) {
   if (!thing || !thing.properties || !thing.properties[property]) {
     throw new Error('thing dose not have property: ' + property);
   }
@@ -121,15 +118,13 @@ GatewayClient.getThingState = async function (client, thing, property) {
     const json = await res.json();
 
     return json[property];
-
   } catch (err) {
     console.log(err);
     throw new Error(`getThingState failed url:${propertyUrl}`);
   }
-}
+};
 
-GatewayClient.setThingState = async function (client, thing, property, state) {
-
+GatewayClient.setThingState = async function(client, thing, property, state) {
   if (!thing || !thing.properties || !thing.properties[property]) {
     throw new Error('thing dose not have property: ' + property);
   }
@@ -145,27 +140,25 @@ GatewayClient.setThingState = async function (client, thing, property, state) {
 
   try {
     const res = await fetch(propertyUrl, iotOptions);
-  
+
     const json = await res.json();
-  
+
     return json[property];
-  
   } catch (err) {
     console.log(err);
     throw new Error(`setThingState failed url:${propertyUrl}`);
   }
-}
+};
 
-GatewayClient.getSmartHomeDeviceProperties = function (thing) {
-
+GatewayClient.getSmartHomeDeviceProperties = function(thing) {
   const device = {
     id    : null,
     type  : null,
     traits: [],
     name  : {
-      //defaultNames: [thing.name],
+      // defaultNames: [thing.name],
       name: thing.name,
-      //nicknames: [thing.name]
+      // nicknames: [thing.name]
     },
     willReportState: false,
     attributes     : {},
@@ -173,8 +166,8 @@ GatewayClient.getSmartHomeDeviceProperties = function (thing) {
       manufacturer: 'mozilla',
       model       : 'gateway',
       hwVersion   : '1.0',
-      swVersion   : '1.0'
-    }
+      swVersion   : '1.0',
+    },
   };
 
   switch (thing.type) {
@@ -223,10 +216,9 @@ GatewayClient.getSmartHomeDeviceProperties = function (thing) {
   }
 
   return device;
-}
+};
 
-GatewayClient.changeSmartHomeDeviceStates = async function (client, thing, states) {
-
+GatewayClient.changeSmartHomeDeviceStates = async function(client, thing, states) {
   try {
     switch (thing.type) {
     case 'onOffSwitch':
@@ -284,15 +276,13 @@ GatewayClient.changeSmartHomeDeviceStates = async function (client, thing, state
       // thermostat
       if (thing.properties.hasOwnProperty('mode') &&
             thing.properties.hasOwnProperty('temperature')) {
-
         if (states.hasOwnProperty('thermostatMode'))
           await GatewayClient.setThingState(client, thing, 'mode', states['thermostatMode']);
 
         if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
-          const temperature = states['thermostatTemperatureSetpoint']
+          const temperature = states['thermostatTemperatureSetpoint'];
           await GatewayClient.setThingState(client, thing, 'temperature', temperature);
         }
-
       }
       break;
     default:
@@ -305,12 +295,11 @@ GatewayClient.changeSmartHomeDeviceStates = async function (client, thing, state
   }
 
   return states;
-}
+};
 
-GatewayClient.getSmartHomeDeviceStates = async function (client, thing) {
-
+GatewayClient.getSmartHomeDeviceStates = async function(client, thing) {
   const states = {
-    online: true
+    online: true,
   };
 
   try {
@@ -340,7 +329,7 @@ GatewayClient.getSmartHomeDeviceStates = async function (client, thing) {
         states['on'] = on;
 
         const color = {
-          spectrumRGB: hex2number(hex)
+          spectrumRGB: hex2number(hex),
         };
         states['color'] = color;
       }
@@ -350,14 +339,14 @@ GatewayClient.getSmartHomeDeviceStates = async function (client, thing) {
         const [on, brightness, hex] = await Promise.all([
           GatewayClient.getThingState(client, thing, 'on'),
           GatewayClient.getThingState(client, thing, 'level'),
-          GatewayClient.getThingState(client, thing, 'color')
+          GatewayClient.getThingState(client, thing, 'color'),
         ]);
 
         states['on'] = on;
         states['brightness'] = brightness;
 
         const color = {
-          spectrumRGB: hex2number(hex)
+          spectrumRGB: hex2number(hex),
         };
         states['color'] = color;
       }
@@ -367,10 +356,9 @@ GatewayClient.getSmartHomeDeviceStates = async function (client, thing) {
       // thermostat
       if (thing.properties.hasOwnProperty('mode') &&
           thing.properties.hasOwnProperty('temperature')) {
-
         const [mode, temperature] = await Promise.all([
           GatewayClient.getThingState(client, thing, 'mode'),
-          GatewayClient.getThingState(client, thing, 'temperature')
+          GatewayClient.getThingState(client, thing, 'temperature'),
         ]);
 
         states['thermostatMode'] = mode;
@@ -387,12 +375,12 @@ GatewayClient.getSmartHomeDeviceStates = async function (client, thing) {
   }
 
   return states;
-}
+};
 
-GatewayClient.getThingId = function (thing) {
-  let href = thing.href;
+GatewayClient.getThingId = function(thing) {
+  const href = thing.href;
   return href.slice(href.lastIndexOf('/') + 1);
-}
+};
 
 /**
  *
@@ -430,7 +418,7 @@ GatewayClient.getThingId = function (thing) {
  *       "barValue": true,
  *       "bazValue": "sheepdip"
  *     }
- *   }, 
+ *   },
  *   "456": {
  *     "id": "456",
  *     "type": "action.devices.types.Light",
@@ -462,16 +450,15 @@ GatewayClient.getThingId = function (thing) {
  *       "barValue": false,
  *       "bazValue": "dancing alpaca"
  *     }
- *   }, 
+ *   },
  *   "234": {
  *     "id": "234"
  *     // ...
  *   }
  * }
  */
-GatewayClient.smartHomeGetDevices = async function (client, deviceList = null) {
-
-  const things = await GatewayClient.getThings(client, deviceList)
+GatewayClient.smartHomeGetDevices = async function(client, deviceList = null) {
+  const things = await GatewayClient.getThings(client, deviceList);
   const devices = {};
   for (let i = 0; i < things.length; i++) {
     const thing = things[i];
@@ -511,10 +498,10 @@ GatewayClient.smartHomeGetDevices = async function (client, deviceList = null) {
  *   ...
  * }
  */
-GatewayClient.smartHomeGetStates = async function (client, deviceList = null) {
+GatewayClient.smartHomeGetStates = async function(client, deviceList = null) {
   const things = await GatewayClient.getThings(client, deviceList);
 
-  const results = await Promise.all(things.map(function (thing) {
+  const results = await Promise.all(things.map(function(thing) {
     return GatewayClient.getSmartHomeDeviceStates(client, thing);
   }));
 
@@ -528,16 +515,16 @@ GatewayClient.smartHomeGetStates = async function (client, deviceList = null) {
   }
 
   return devices;
-}
+};
 
 /**
- * 
+ *
  * @param deviceList:
  * [
  *   "123",
  *   "234"
  * ]
- * 
+ *
  * @param exec:
  * [{
  *   "command": "action.devices.commands.OnOff",
@@ -551,8 +538,7 @@ GatewayClient.smartHomeGetStates = async function (client, deviceList = null) {
  *   "on": true
  * }
  */
-GatewayClient.smartHomeExec = async function (client, deviceList, exec) {
-
+GatewayClient.smartHomeExec = async function(client, deviceList, exec) {
   const things = await GatewayClient.getThings(client, deviceList);
 
   let states = {};
@@ -561,13 +547,13 @@ GatewayClient.smartHomeExec = async function (client, deviceList, exec) {
     states = Object.assign(states, exec[i].params);
   }
 
-  await Promise.all(things.map(function (thing) {
+  await Promise.all(things.map(function(thing) {
     return GatewayClient.changeSmartHomeDeviceStates(client, thing, states);
   }));
 
   // TODO return current states
   return states;
-}
+};
 
 exports.smartHomeGetDevices = GatewayClient.smartHomeGetDevices;
 exports.smartHomeGetStates = GatewayClient.smartHomeGetStates;

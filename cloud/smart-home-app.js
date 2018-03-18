@@ -3,7 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-//const ngrok = require('ngrok');
+// const ngrok = require('ngrok');
 const session = require('express-session');
 
 // internal app deps
@@ -14,22 +14,22 @@ const config = require('./config-provider');
 process.on('unhandledRejection', console.dir);
 
 function createApp(config) {
-  let app = express();
+  const app = express();
   app.use(morgan('dev'));
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.urlencoded({extended: true}));
   app.set('trust proxy', 1);
   app.use(session({
     name             : '__session',
     secret           : 'xyzsecret',
     resave           : false,
     saveUninitialized: true,
-    cookie           : { secure: false }
+    cookie           : {secure: false},
   }));
 
   // !firebase functions
   if (!process.env.GCLOUD_PROJECT) {
-    app.listen(config.devPortSmartHome, function () {
+    app.listen(config.devPortSmartHome, function() {
       /*
       ngrok.connect(config.devPortSmartHome, function (err, url) {
         if (err) {
@@ -60,7 +60,7 @@ function createApp(config) {
   return app;
 }
 
-let app = createApp(config);
+const app = createApp(config);
 
 app.use('/gateway/', express.static(__dirname + '/../static/build/default'));
 

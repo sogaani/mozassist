@@ -13,7 +13,7 @@ const option = require('../config.json');
 Config = Object.assign(Config, option);
 
 function init() {
-  process.argv.forEach(function (value, i, arr) {
+  process.argv.forEach(function(value, i, arr) {
     if (value.includes('smart-home='))
       Config.smartHomeProviderCloudEndpoint = value.split('=')[1];
     else if (value.includes('isLocal'))

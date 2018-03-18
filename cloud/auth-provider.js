@@ -2,11 +2,11 @@
 
 const util = require('util');
 const fetch = require('node-fetch');
-//const oauthClients = require('../../src/models/oauthclients');
+// const oauthClients = require('../../src/models/oauthclients');
 const config = require('./config-provider');
 const datastore = require('./datastore');
 const url = require('url');
-const { requestSync } = require('./home-graph');
+const {requestSync} = require('./home-graph');
 
 datastore.open();
 
@@ -15,18 +15,17 @@ var GatewayModel = {};
 
 const DEBUG = true;
 
-GatewayModel.gatewayToId = function (gateway) {
+GatewayModel.gatewayToId = function(gateway) {
   return new Buffer(gateway).toString('base64');
-}
+};
 
-Auth.getAccessToken = function (request) {
+Auth.getAccessToken = function(request) {
   return request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
 };
 
-Auth.registerAuth = function (app) {
-
+Auth.registerAuth = function(app) {
   // 1. Assistant App try to be authorized.
-  app.get('/oauth', function (req, res) {
+  app.get('/oauth', function(req, res) {
     const client_id = req.query.client_id;
     const redirect_uri = req.query.redirect_uri;
     const state = req.query.state;
@@ -47,8 +46,8 @@ Auth.registerAuth = function (app) {
         redirect_uri : redirect_uri,
         response_type: response_type,
         state        : state,
-        scope        : scope
-      }
+        scope        : scope,
+      },
     });
 
     // 2. User inputs Mozilla Gateway infomation.
@@ -56,7 +55,7 @@ Auth.registerAuth = function (app) {
   });
 
   // 3. Redirect to Mozilla Gateway to delegate authentication.
-  app.get('/gateway/oauth', async function (req, res) {
+  app.get('/gateway/oauth', async function(req, res) {
     const domain = req.query.domain;
     const client_id = req.query.client_id;
     const client_secret = req.query.client_secret;
@@ -72,7 +71,7 @@ Auth.registerAuth = function (app) {
       gateway      : `https://${domain}.mozilla-iot.org`,
       client_id    : client_id,
       client_secret: client_secret,
-      redirect_uri : redirect_uri
+      redirect_uri : redirect_uri,
     };
 
     await datastore.registerGatewayWithState(state, client);
@@ -84,15 +83,15 @@ Auth.registerAuth = function (app) {
         redirect_uri : `https://${req.hostname}/allow`,
         response_type: response_type,
         state        : state,
-        scope        : scope
-      }
+        scope        : scope,
+      },
     });
 
     return res.redirect(gatewayUrl);
   });
 
   // 4. If allow, Mozilla Gateway redirect here with code and state.
-  app.get('/allow', async function (req, res) {
+  app.get('/allow', async function(req, res) {
     const code = req.query.code;
     const state = req.query.state;
 
@@ -112,14 +111,14 @@ Auth.registerAuth = function (app) {
       pathname: client.redirect_uri,
       query   : {
         state: state,
-        code : code
-      }
+        code : code,
+      },
     });
 
     return res.redirect(gatewayUrl);
   });
 
-  app.all('/token', async function (req, res) {
+  app.all('/token', async function(req, res) {
     DEBUG && console.log('/token query', req.query);
     DEBUG && console.log('/token body', req.body);
     const code = req.query.code || req.body.code;
@@ -164,7 +163,7 @@ Auth.registerAuth = function (app) {
         `client_id=${client.client_id}&` +
         `client_secret=${client.client_secret}&` +
         `redirect_uri=${encodeURIComponent(`https://${req.hostname}/allow`)}&` +
-        `grant_type=${grant_type}`
+        `grant_type=${grant_type}`,
     };
 
     try {
@@ -183,7 +182,6 @@ Auth.registerAuth = function (app) {
       setTimeout(requestSync, 2000, GatewayModel.gatewayToId(client.gateway));
 
       return res.json(json);
-
     } catch (err) {
       console.error(err);
       return res.status(500).send('Internal Server Error');

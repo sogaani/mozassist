@@ -11,11 +11,11 @@ async function requestSync(id) {
     method : 'POST',
     headers: {
       'Content-Type': 'application/json',
-    }
+    },
   };
 
   const optBody = {
-    'agentUserId': id
+    'agentUserId': id,
   };
   options.body = JSON.stringify(optBody);
 
