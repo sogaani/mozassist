@@ -29,9 +29,9 @@ function createApp(config) {
 
   // !firebase functions
   if (!process.env.GCLOUD_PROJECT) {
-    app.listen(config.devPortSmartHome, function() {
+    app.listen(config.devPort, function() {
       /*
-      ngrok.connect(config.devPortSmartHome, function (err, url) {
+      ngrok.connect(config.devPort, function (err, url) {
         if (err) {
           console.log('ngrok err', err);
           process.exit();

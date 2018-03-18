@@ -3,11 +3,11 @@
 const option = require('../config.json');
 
 var Config = {
-  devPortSmartHome       : '31338',
-  clientId               : 'hello',
-  clientSecret           : 'dafD8jraghakjnewuac',
-  smartHomeProviderApiKey: '<API_KEY>',
-  isLocal                : false,
+  devPort        : '31338',
+  clientId       : 'hello',
+  clientSecret   : 'dafD8jraghakjnewuac',
+  homeGraphApiKey: '<API_KEY>',
+  isLocal        : false,
 };
 
 Config = Object.assign(Config, option);
