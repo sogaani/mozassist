@@ -6,6 +6,7 @@ const fetch = require('node-fetch');
 const config = require('./config-provider');
 const datastore = require('./datastore');
 const url = require('url');
+const {requestSync} = require('./home-graph');
 
 datastore.open();
 
@@ -173,6 +174,7 @@ Auth.registerAuth = function (app) {
             const token = json.access_token;
             client.token = token;
             await datastore.registerGatewayWithToken(token, client);
+            setTimeout(requestSync, 2000, GatewayModel.gatewayToId(client.gateway));
             return res.json(json);
           }
         }).

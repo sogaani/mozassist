@@ -1,34 +1,30 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const config = require('./config-provider');
 
 const requestSyncEndpoint = 'https://homegraph.googleapis.com/v1/devices:requestSync?key=';
 
-var requestSync = function (config) {
+async function requestSync(id) {
   // REQUEST_SYNC
-  return new Promise((resolve, reject) => {
-    const apiKey = config.api_key;
-    const options = {
-      method : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    };
+  const options = {
+    method : 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
 
-    let optBody = {
-      'agentUserId': config.gateway
-    };
-    options.body = JSON.stringify(optBody);
-    console.log('POST REQUEST_SYNC', apiKey, options.body);
+  const optBody = {
+    'agentUserId': id
+  };
+  options.body = JSON.stringify(optBody);
 
-    fetch(requestSyncEndpoint + apiKey, options).
-      then(function (res) {
-        console.log('request-sync response', res.status, res.statusText);
-        resolve();
-      }).catch((error) => {
-        reject(error)
-      });
-  });
-};
+  try {
+    const syncUrl = requestSyncEndpoint + config.smartHomeProviderApiKey;
+    await fetch(syncUrl, options);
+  } catch (e) {
+    console.error('POST REQUEST_SYNC: failed', e);
+  }
+}
 
 exports.requestSync = requestSync;
