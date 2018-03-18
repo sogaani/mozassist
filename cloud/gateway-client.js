@@ -176,12 +176,13 @@ GatewayClient.getSmartHomeDeviceProperties = function (thing) {
     },
     willReportState: false,
     attributes: {},
+    /* this is
     deviceInfo: {
       manufacturer: "mozilla",
       model: "gateway",
       hwVersion: "1.0",
       swVersion: "1.0"
-    }
+    }*/
   };
 
   switch (thing.type) {
