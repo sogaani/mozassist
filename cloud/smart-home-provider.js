@@ -68,14 +68,14 @@ function registerAgent(app) {
       case 'action.devices.SYNC':
         DEBUG && console.log('post /smarthome SYNC');
         /**
-             * request:
-             * {
-             *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-             *  "inputs": [{
-             *      "intent": "action.devices.SYNC",
-             *  }]
-             * }
-             */
+                             * request:
+                             * {
+                             *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                             *  "inputs": [{
+                             *      "intent": "action.devices.SYNC",
+                             *  }]
+                             * }
+                             */
         sync(client, {
           requestId: reqdata.requestId
         }, response);
@@ -83,31 +83,31 @@ function registerAgent(app) {
       case 'action.devices.QUERY':
         DEBUG && console.log('post /smarthome QUERY');
         /**
-             * request:
-             * {
-             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-             *   "inputs": [{
-             *       "intent": "action.devices.QUERY",
-             *       "payload": {
-             *          "devices": [{
-             *            "id": "123",
-             *            "customData": {
-             *              "fooValue": 12,
-             *              "barValue": true,
-             *              "bazValue": "alpaca sauce"
-             *            }
-             *          }, {
-             *            "id": "234",
-             *            "customData": {
-             *              "fooValue": 74,
-             *              "barValue": false,
-             *              "bazValue": "sheep dip"
-             *            }
-             *          }]
-             *       }
-             *   }]
-             * }
-             */
+                             * request:
+                             * {
+                             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                             *   "inputs": [{
+                             *       "intent": "action.devices.QUERY",
+                             *       "payload": {
+                             *          "devices": [{
+                             *            "id": "123",
+                             *            "customData": {
+                             *              "fooValue": 12,
+                             *              "barValue": true,
+                             *              "bazValue": "alpaca sauce"
+                             *            }
+                             *          }, {
+                             *            "id": "234",
+                             *            "customData": {
+                             *              "fooValue": 74,
+                             *              "barValue": false,
+                             *              "bazValue": "sheep dip"
+                             *            }
+                             *          }]
+                             *       }
+                             *   }]
+                             * }
+                             */
         query(client, {
           requestId: reqdata.requestId,
           devices  : reqdata.inputs[0].payload.devices
@@ -117,39 +117,39 @@ function registerAgent(app) {
       case 'action.devices.EXECUTE':
         DEBUG && console.log('post /smarthome EXECUTE');
         /**
-             * request:
-             * {
-             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-             *   "inputs": [{
-             *     "intent": "action.devices.EXECUTE",
-             *     "payload": {
-             *       "commands": [{
-             *         "devices": [{
-             *           "id": "123",
-             *           "customData": {
-             *             "fooValue": 12,
-             *             "barValue": true,
-             *             "bazValue": "alpaca sauce"
-             *           }
-             *         }, {
-             *           "id": "234",
-             *           "customData": {
-             *              "fooValue": 74,
-             *              "barValue": false,
-             *              "bazValue": "sheep dip"
-             *           }
-             *         }],
-             *         "execution": [{
-             *           "command": "action.devices.commands.OnOff",
-             *           "params": {
-             *             "on": true
-             *           }
-             *         }]
-             *       }]
-             *     }
-             *   }]
-             * }
-             */
+                             * request:
+                             * {
+                             *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+                             *   "inputs": [{
+                             *     "intent": "action.devices.EXECUTE",
+                             *     "payload": {
+                             *       "commands": [{
+                             *         "devices": [{
+                             *           "id": "123",
+                             *           "customData": {
+                             *             "fooValue": 12,
+                             *             "barValue": true,
+                             *             "bazValue": "alpaca sauce"
+                             *           }
+                             *         }, {
+                             *           "id": "234",
+                             *           "customData": {
+                             *              "fooValue": 74,
+                             *              "barValue": false,
+                             *              "bazValue": "sheep dip"
+                             *           }
+                             *         }],
+                             *         "execution": [{
+                             *           "command": "action.devices.commands.OnOff",
+                             *           "params": {
+                             *             "on": true
+                             *           }
+                             *         }]
+                             *       }]
+                             *     }
+                             *   }]
+                             * }
+                             */
         exec(client, {
           requestId: reqdata.requestId,
           commands : reqdata.inputs[0].payload.commands
@@ -253,38 +253,41 @@ function registerAgent(app) {
    *   }
    * }
    */
-  function sync(client, data, response) {
-    return new Promise((resolve) => {
-      gatewayClient.smartHomeGetDevices(client).then(devices => {
-        if (!devices) {
-          response.status(500).set({
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }).json({ error: 'failed' });
-          resolve();
-          return;
-        }
-        let deviceList = [];
-        Object.keys(devices).forEach(function (key) {
-          if (devices.hasOwnProperty(key) && devices[key]) {
-            DEBUG && console.log('Getting device information for id \'' + key + '\'');
-            let device = devices[key];
-            device.id = key;
-            deviceList.push(device);
-          }
-        });
-        let deviceProps = {
-          requestId: data.requestId,
-          payload  : {
-            agentUserId: auth.gatewayToId(client.gateway),
-            devices    : deviceList
-          }
-        };
-        DEBUG && console.log('sync response', JSON.stringify(deviceProps, undefined, 1));
-        response.status(200).json(deviceProps);
-        resolve(deviceProps);
-      });
+  async function sync(client, data, response) {
+    const devices = await gatewayClient.smartHomeGetDevices(client);
+
+    if (!devices) {
+      response.status(500).set({
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }).json({ error: 'failed' });
+      return;
+    }
+
+    let deviceList = [];
+
+    Object.keys(devices).forEach(function (key) {
+      if (devices.hasOwnProperty(key) && devices[key]) {
+        DEBUG && console.log('Getting device information for id \'' + key + '\'');
+
+        let device = devices[key];
+        device.id = key;
+        deviceList.push(device);
+      }
     });
+
+    let deviceProps = {
+      requestId: data.requestId,
+      payload  : {
+        agentUserId: auth.gatewayToId(client.gateway),
+        devices    : deviceList
+      }
+    };
+
+    DEBUG && console.log('sync response', JSON.stringify(deviceProps, undefined, 1));
+
+    response.status(200).json(deviceProps);
+    return;
   }
 
   /**
@@ -328,31 +331,30 @@ function registerAgent(app) {
    *   }
    * }
    */
-  function query(client, data, response) {
+  async function query(client, data, response) {
     DEBUG && console.log('query', JSON.stringify(data));
+
     let deviceIds = getDeviceIds(data.devices);
 
-    return new Promise((resolve) => {
-      gatewayClient.smartHomeGetStates(client, deviceIds).then(devices => {
-        if (!devices) {
-          response.status(500).set({
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }).json({ error: 'failed' });
-          resolve();
-          return;
-        }
-        let deviceStates = {
-          requestId: data.requestId,
-          payload  : {
-            devices: devices
-          }
-        };
-        DEBUG && console.log('query response', JSON.stringify(deviceStates));
-        response.status(200).json(deviceStates);
-        resolve(deviceStates);
-      });
-    });
+    const devices = await gatewayClient.smartHomeGetStates(client, deviceIds);
+    if (!devices) {
+      response.status(500).set({
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }).json({ error: 'failed' });
+      return;
+    }
+
+    let deviceStates = {
+      requestId: data.requestId,
+      payload  : {
+        devices: devices
+      }
+    };
+
+    DEBUG && console.log('query response', JSON.stringify(deviceStates));
+    response.status(200).json(deviceStates);
+    return;
   }
 
   /**
@@ -435,54 +437,52 @@ function registerAgent(app) {
    *   }
    * }
    */
-  function exec(client, data, response) {
+  async function exec(client, data, response) {
     DEBUG && console.log('exec', JSON.stringify(data));
 
-    return new Promise((resolve) => {
-      let respCommands = [];
+    const promises = data.commands.map(function (curCommand) {
+      const deviceIds = getDeviceIds(curCommand.devices);
+      const exec = curCommand.execution;
 
-      let promises = data.commands.map(function (curCommand) {
-        let deviceIds = getDeviceIds(curCommand.devices);
-        let exec = curCommand.execution;
+      return new Promise(async (resolve) => {
+        try {
+          const states = await gatewayClient.smartHomeExec(client, deviceIds, exec)
 
-        return new Promise((resolve) => {
-          gatewayClient.smartHomeExec(client, deviceIds, exec).then((states) => {
-
-            respCommands.push({
-              ids      : deviceIds,
-              status   : 'SUCCESS',
-              states   : states,
-              errorCode: undefined
-            });
-            resolve();
-
-          }).catch(error => {
-            console.error(error);
-            respCommands.push({
-              ids   : deviceIds,
-              status: 'OFFLINE',
-              states: {
-                online: false
-              },
-              errorCode: error
-            });
-            resolve();
+          resolve({
+            ids      : deviceIds,
+            status   : 'SUCCESS',
+            states   : states,
+            errorCode: undefined
           });
-        });
-      });
 
-      Promise.all(promises).then(() => {
-        let resBody = {
-          requestId: data.requestId,
-          payload  : {
-            commands: respCommands
-          }
-        };
-        DEBUG && console.log('exec response', JSON.stringify(resBody));
-        response.status(200).json(resBody);
-        resolve(resBody);
+        } catch (error) {
+          console.error(error);
+
+          resolve({
+            ids   : deviceIds,
+            status: 'OFFLINE',
+            states: {
+              online: false
+            },
+            errorCode: error
+          });
+        }
       });
     });
+
+    const respCommands = await Promise.all(promises);
+
+    const resBody = {
+      requestId: data.requestId,
+      payload  : {
+        commands: respCommands
+      }
+    };
+
+    DEBUG && console.log('exec response', JSON.stringify(resBody));
+
+    response.status(200).json(resBody);
+    return;
   }
 }
 

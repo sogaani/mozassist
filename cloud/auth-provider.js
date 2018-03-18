@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 const config = require('./config-provider');
 const datastore = require('./datastore');
 const url = require('url');
-const {requestSync} = require('./home-graph');
+const { requestSync } = require('./home-graph');
 
 datastore.open();
 
@@ -27,11 +27,11 @@ Auth.registerAuth = function (app) {
 
   // 1. Assistant App try to be authorized.
   app.get('/oauth', function (req, res) {
-    let client_id = req.query.client_id;
-    let redirect_uri = req.query.redirect_uri;
-    let state = req.query.state;
-    let response_type = req.query.response_type;
-    let scope = req.query.scope;
+    const client_id = req.query.client_id;
+    const redirect_uri = req.query.redirect_uri;
+    const state = req.query.state;
+    const response_type = req.query.response_type;
+    const scope = req.query.scope;
 
     if ('code' != response_type)
       return res.status(500).send('response_type ' + response_type + ' must equal "code"');
@@ -41,7 +41,7 @@ Auth.registerAuth = function (app) {
       return res.status(400).send('incorrect client data');
     }
 
-    let inputFormUrl = url.format({
+    const inputFormUrl = url.format({
       pathname: '/gateway',
       query   : {
         redirect_uri : redirect_uri,
@@ -57,13 +57,13 @@ Auth.registerAuth = function (app) {
 
   // 3. Redirect to Mozilla Gateway to delegate authentication.
   app.get('/gateway/oauth', async function (req, res) {
-    let domain = req.query.domain;
-    let client_id = req.query.client_id;
-    let client_secret = req.query.client_secret;
-    let redirect_uri = req.query.redirect_uri;
-    let state = req.query.state;
-    let response_type = req.query.response_type;
-    let scope = req.query.scope;
+    const domain = req.query.domain;
+    const client_id = req.query.client_id;
+    const client_secret = req.query.client_secret;
+    const redirect_uri = req.query.redirect_uri;
+    const state = req.query.state;
+    const response_type = req.query.response_type;
+    const scope = req.query.scope;
 
     if ('code' != response_type)
       return res.status(500).send('response_type ' + response_type + ' must equal "code"');
@@ -77,7 +77,7 @@ Auth.registerAuth = function (app) {
 
     await datastore.registerGatewayWithState(state, client);
 
-    let gatewayUrl = url.format({
+    const gatewayUrl = url.format({
       pathname: client.gateway + '/oauth/authorize',
       query   : {
         client_id    : client.client_id,
@@ -88,14 +88,13 @@ Auth.registerAuth = function (app) {
       }
     });
 
-    console.log(gatewayUrl);
     return res.redirect(gatewayUrl);
   });
 
   // 4. If allow, Mozilla Gateway redirect here with code and state.
   app.get('/allow', async function (req, res) {
-    let code = req.query.code;
-    let state = req.query.state;
+    const code = req.query.code;
+    const state = req.query.state;
 
     if (!code || !state)
       return res.status(400).send('authorization failed');
@@ -109,7 +108,7 @@ Auth.registerAuth = function (app) {
 
     await datastore.registerGatewayWithState(code, client);
 
-    let gatewayUrl = url.format({
+    const gatewayUrl = url.format({
       pathname: client.redirect_uri,
       query   : {
         state: state,
@@ -123,19 +122,20 @@ Auth.registerAuth = function (app) {
   app.all('/token', async function (req, res) {
     DEBUG && console.log('/token query', req.query);
     DEBUG && console.log('/token body', req.body);
-    let code = req.query.code ? req.query.code : req.body.code;
-    let client_id = req.query.client_id ? req.query.client_id : req.body.client_id;
-    let client_secret = req.query.client_secret ? req.query.client_secret : req.body.client_secret;
-    let redirect_uri = req.query.redirect_uri ? req.query.redirect_uri : req.body.redirect_uri;
-    let grant_type = req.query.grant_type ? req.query.grant_type : req.body.grant_type;
-    let state = req.query.state ? req.query.state : req.body.state;
+    const code = req.query.code || req.body.code;
+    const client_id = req.query.client_id || req.body.client_id;
+    const client_secret = req.query.client_secret || req.body.client_secret;
+    const grant_type = req.query.grant_type || req.body.grant_type;
+    // const redirect_uri = req.query.redirect_uri || req.body.redirect_uri;
+    // const state = req.query.state || req.body.state;
 
     if (!client_id || !client_secret) {
       console.error('missing required parameter');
       return res.status(400).send('missing required parameter');
     }
 
-    if (client_id !== config.clientId || client_secret !== config.clientSecret) {
+    if (client_id !== config.clientId ||
+      client_secret !== config.clientSecret) {
       console.error('incorrect client data');
       return res.status(400).send('incorrect client data');
     }
@@ -148,45 +148,45 @@ Auth.registerAuth = function (app) {
       return res.status(400).send('have not connect gateway');
     }
 
-    if ('authorization_code' == grant_type) {
-      const options = {
-        method : 'POST',
-        headers: {
-          'Content-Type' : 'application/x-www-form-urlencoded',
-          'authorization': 'Basic ' + userPassB64,
-        },
-        body: `code=${code}&` +
-          `client_id=${client.client_id}&` +
-          `client_secret=${client.client_secret}&` +
-          `redirect_uri=${encodeURIComponent(`https://${req.hostname}/allow`)}&` +
-          `grant_type=${grant_type}`
-      };
-
-      fetch(util.format('%s/oauth/token', client.gateway), options)
-        .then(function (_res) {
-          return _res.json();
-        })
-        .then(async (json) => {
-          console.log(json);
-          if (json.error) {
-            return res.status(400).json(json);
-          } else {
-            const token = json.access_token;
-            client.token = token;
-            await datastore.registerGatewayWithToken(token, client);
-            setTimeout(requestSync, 2000, GatewayModel.gatewayToId(client.gateway));
-            return res.json(json);
-          }
-        }).
-        catch(err => {
-          console.log(err);
-          return res.status(400).json(err);
-        });
-
-    } else {
+    if ('authorization_code' !== grant_type) {
       console.error('grant_type ' + grant_type + ' is not supported');
       res.status(400).send('grant_type ' + grant_type + ' is not supported');
       return;
+    }
+
+    const options = {
+      method : 'POST',
+      headers: {
+        'Content-Type' : 'application/x-www-form-urlencoded',
+        'authorization': 'Basic ' + userPassB64,
+      },
+      body: `code=${code}&` +
+        `client_id=${client.client_id}&` +
+        `client_secret=${client.client_secret}&` +
+        `redirect_uri=${encodeURIComponent(`https://${req.hostname}/allow`)}&` +
+        `grant_type=${grant_type}`
+    };
+
+    try {
+      const resp = await fetch(util.format('%s/oauth/token', client.gateway), options);
+      const json = await resp.json();
+
+      if (json.error) {
+        return res.status(400).json(json);
+      }
+
+      const token = json.access_token;
+      client.token = token;
+
+      await datastore.registerGatewayWithToken(token, client);
+
+      setTimeout(requestSync, 2000, GatewayModel.gatewayToId(client.gateway));
+
+      return res.json(json);
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send('Internal Server Error');
     }
   });
 };
