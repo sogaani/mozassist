@@ -4,8 +4,11 @@ const fetch = require('node-fetch');
 const gatewayClient = require('./gateway-client');
 const config = require('./config-provider');
 const auth = require('./auth-provider');
+const datastore = require('./datastore');
 
-const DEBUG = false;
+datastore.open();
+
+const DEBUG = true;
 
 function registerAgent(app) {
   /**
@@ -24,13 +27,13 @@ function registerAgent(app) {
    *   }
    * }
    */
-  app.post('/smarthome', function (request, response) {
-    DEBUG && console.log('smarthome', reqdata);
-
+  app.post('/smarthome', async function (request, response) {
     let reqdata = request.body;
     let authToken = auth.getAccessToken(request);
 
-    const client = auth.getClient(authToken);
+    DEBUG && console.log('smarthome', reqdata);
+
+    const client = await datastore.getGatewayByToken(authToken);
 
     if (!client) {
       response.status(403).set({

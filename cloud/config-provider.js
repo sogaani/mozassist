@@ -31,3 +31,4 @@ exports.smartHomeProviderApiKey = Config.smartHomeProviderApiKey;
 exports.clientId = Config.clientId;
 exports.clientSecret = Config.clientSecret;
 exports.isLocal = Config.isLocal;
+exports.googleServiceAccount = Config.googleServiceAccount;
