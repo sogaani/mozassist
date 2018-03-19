@@ -9,12 +9,16 @@ try {
   }
 
   option = process.env;
+  if (option.googleServiceAccount) {
+    option.googleServiceAccount = JSON.parse(option.googleServiceAccount);
+  }
 }
 
 var Config = {
   devPort             : '31338',
   clientId            : 'hello',
   clientSecret        : 'dafD8jraghakjnewuac',
+  redirectUrl         : 'https://oauth-redirect.googleusercontent.com/r/YOUR_PROJECT_ID',
   homeGraphApiKey     : '<API_KEY>',
   isLocal             : false,
   googleServiceAccount: {},

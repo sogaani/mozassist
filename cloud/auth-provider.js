@@ -9,7 +9,7 @@ const {requestSync} = require('./home-graph');
 
 datastore.open();
 
-const DEBUG = true;
+const DEBUG = false;
 
 function gatewayToId(gateway) {
   return new Buffer(gateway).toString('base64');
@@ -31,7 +31,8 @@ function registerAuth(app) {
     if ('code' != response_type)
       return res.status(500).send('response_type ' + response_type + ' must equal "code"');
 
-    if (client_id !== config.clientId) {
+    if (client_id !== config.clientId ||
+      redirect_uri !== config.redirectUrl) {
       console.error('incorrect client data');
       return res.status(400).send('incorrect client data');
     }
@@ -121,7 +122,7 @@ function registerAuth(app) {
     const client_id = req.query.client_id || req.body.client_id;
     const client_secret = req.query.client_secret || req.body.client_secret;
     const grant_type = req.query.grant_type || req.body.grant_type;
-    // const redirect_uri = req.query.redirect_uri || req.body.redirect_uri;
+    const redirect_uri = req.query.redirect_uri || req.body.redirect_uri;
     // const state = req.query.state || req.body.state;
 
     if (!client_id || !client_secret) {
@@ -130,7 +131,8 @@ function registerAuth(app) {
     }
 
     if (client_id !== config.clientId ||
-      client_secret !== config.clientSecret) {
+      client_secret !== config.clientSecret ||
+      redirect_uri !== config.redirectUrl) {
       console.error('incorrect client data');
       return res.status(400).send('incorrect client data');
     }
