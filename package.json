@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js isLocal",
+    "postinstall": "npm run bower && npm run minfy",
     "build": "npm run lint && npm run minfy",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "bower": "cd static && bower install",
     "minfy": "cd static && polymer build"
   },
   "keywords": [
