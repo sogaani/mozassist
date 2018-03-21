@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-	<title>Google Home with Mozilla Gateway</title>
+	<title>Hub-Gath</title>
 	<meta name="description" content="Google Home with Mozilla Gateway">
 
 	<link rel="icon" href="images/favicon.ico">
@@ -31,6 +31,11 @@
 			background-color: #fafafa;
 		}
 
+		div.top {
+			text-align: center;
+			margin-top: 30;
+		}
+
 		div.main {
 			margin-left: auto;
 			margin-right: auto;
@@ -38,25 +43,25 @@
 		}
 
 		div.main>h1 {
-			text-align: center;
+			margin-left: 10%;
+			margin-right: 10%;
+			text-align: left;
 			color: #333;
+			border-bottom: 2px solid #050505;
 		}
 
 		paper-input {
-			width: calc(100% - 40px);
-			margin-left: 20px;
+			box-sizing: border-box;
+			width: 80%;
+			margin-left: 10%;
 			text-align: left;
 		}
 
-		paper-input iron-icon {
-			margin-right: 16px;
-			color: #555;
-		}
-
 		paper-button {
-			margin-left: 20px;
+			margin-left: 10%;
 			margin-top: 40px;
 			color: white;
+			width: 80%;
 			background-color: #085181;
 		}
 
@@ -70,17 +75,14 @@
 			div.main {
 				width: 600px;
 			}
-			paper-input {
-				margin-left: 80px;
-			}
-			paper-button {
-				margin-left: 80px;
-			}
 		}
 	</style>
 </head>
 
 <body>
+	<div class='top'>
+		<img src='images/hug-gath.png' />
+	</div>
 
 	<div class='main'>
 		<h1>Connect your Mozilla Gateway</h1>
