@@ -2,7 +2,8 @@
   "entrypoint": "index.html",
   "fragments": [],
   "sources": [
-    "imports.html",
+    "policy/index.html",
+    "terms/index.html",
     "images/*"
   ],
   "builds": [
