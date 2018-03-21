@@ -62,7 +62,7 @@ function createApp(config) {
 
 const app = createApp(config);
 
-app.use('/gateway/', express.static(__dirname + '/../static/build/default'));
+app.use('/static/', express.static(__dirname + '/../static/build/default'));
 
 google_ha.registerAgent(app);
 auth.registerAuth(app);

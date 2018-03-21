@@ -38,7 +38,7 @@ function registerAuth(app) {
     }
 
     const inputFormUrl = url.format({
-      pathname: '/gateway',
+      pathname: '/static',
       query   : {
         redirect_uri : redirect_uri,
         response_type: response_type,
