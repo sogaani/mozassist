@@ -3,9 +3,9 @@
 const config = require('../config.json');
 const child_process = require('child_process');
 
-Object.keys(config).forEach(function(key) {
-  const args = ['config:set'];
+const args = ['config:set'];
 
+Object.keys(config).forEach(function(key) {
   let value = config[key];
 
   if (key === 'googleServiceAccount') {
@@ -13,5 +13,6 @@ Object.keys(config).forEach(function(key) {
   }
 
   args.push(`${key}=${value}`);
-  child_process.spawnSync('heroku', args, {stdio: 'inherit'});
 });
+
+child_process.spawnSync('heroku', args, {stdio: 'inherit'});
