@@ -21,3 +21,8 @@ oauthClients.register(
 ```
 
 The Client ID and The Client Secret must change to string that others do not know.
+
+## Known issues
+
+* Things Gateway =< 3.1. After logging into the Things Gateway, it can not redirect to the authentication screen. [See issue](https://github.com/mozilla-iot/gateway/issues/779). In the second access from mozassistant to the Things Gateway, the authentication screen is displayed.
+
