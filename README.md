@@ -1,18 +1,18 @@
-# Hub-Gath
+# MozAssist
 [Google Smart Home App](https://developers.google.com/actions/smarthome/) that connect Google Assistant and Mozilla Things Gateway.
 
 ## Prerequisites for connecting Things Gateway
 
 ### Create authorization credentials
 
-The [Things Gateway](https://github.com/mozilla-iot/gateway/blob/master/README.md) must create authorization credentials that allow the Hub-Gath to access your Things Gateway APIs.
+The [Things Gateway](https://github.com/mozilla-iot/gateway/blob/master/README.md) must create authorization credentials that allow the MozAssist to access your Things Gateway APIs.
 
 Things Gateway =< 3.1 have no UI to create authorization credentials, and thus add some codes.
 Add following codes to the end of src/models/oauthclients.ts.
 
 ```js
 oauthClients.register(
-  new ClientRegistry(new URL('https://hub-gath.sogaani.com/allow'),
+  new ClientRegistry(new URL('https://mozassist.sogaani.com/allow'),
     'hoge', // Client ID
     'Hello',
     'hoge', // Client Secret
