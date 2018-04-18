@@ -9,7 +9,7 @@ const {requestSync} = require('./home-graph');
 
 datastore.open();
 
-const DEBUG = false;
+const DEBUG = true;
 
 function gatewayToId(gateway) {
   return new Buffer(gateway).toString('base64');
@@ -138,6 +138,7 @@ function registerAuth(app) {
     }
 
     const client = await datastore.getGatewayByState(code);
+    DEBUG && console.log('client', client);
     var userPassB64 = new Buffer(`${client.client_id}:${client.client_secret}`).toString('base64');
 
     if (!client || !client.client_id || !client.client_secret) {
@@ -169,6 +170,7 @@ function registerAuth(app) {
       const json = await resp.json();
 
       if (json.error) {
+        console.error('gateway returns error', json);
         return res.status(400).json(json);
       }
 

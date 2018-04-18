@@ -6,7 +6,7 @@ const datastore = require('./datastore');
 
 datastore.open();
 
-const DEBUG = false;
+const DEBUG = true;
 
 function registerAgent(app) {
   /**
