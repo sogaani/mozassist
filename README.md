@@ -7,7 +7,7 @@
 
 The [Things Gateway](https://github.com/mozilla-iot/gateway/blob/master/README.md) must create authorization credentials that allow the MozAssist to access your Things Gateway APIs.
 
-Things Gateway =< 3.1 have no UI to create authorization credentials, and thus add some codes.
+Things Gateway =< 0.4 have no UI to create authorization credentials, and thus add some codes.
 Add following codes to the end of src/models/oauthclients.ts.
 
 ```js
@@ -16,7 +16,7 @@ oauthClients.register(
     'hoge', // Client ID
     'Hello',
     'hoge', // Client Secret
-    'readwrite')
+    '/things:readwrite')
 );
 ```
 
