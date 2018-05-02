@@ -71,7 +71,12 @@ function registerAuth(app) {
       redirect_uri : redirect_uri,
     };
 
-    await datastore.registerGatewayWithState(state, client);
+    try{
+      await datastore.registerGatewayWithState(state, client);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send('Internal Server Error');
+    }
 
     const gatewayUrl = url.format({
       pathname: client.gateway + '/oauth/authorize',
@@ -101,8 +106,12 @@ function registerAuth(app) {
       console.error('have not connect gateway');
       return res.status(400).send('have not connect gateway');
     }
-
-    await datastore.registerGatewayWithState(code, client);
+    try{
+      await datastore.registerGatewayWithState(code, client);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send('Internal Server Error');
+    }
 
     const gatewayUrl = url.format({
       pathname: client.redirect_uri,
