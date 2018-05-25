@@ -3,12 +3,14 @@
 const TYPE_SWITCH = 'action.devices.types.SWITCH';
 const TYPE_LIGHT = 'action.devices.types.LIGHT';
 const TYPE_THERMOSTAT = 'action.devices.types.THERMOSTAT';
+const TYPE_OUTLET = 'action.devices.types.OUTLET';
 
 const TRAITS_ONOFF = 'action.devices.traits.OnOff';
 const TRAITS_BRIGHTNESS = 'action.devices.traits.Brightness';
 const TRAITS_COLORSPEC = 'action.devices.traits.ColorSpectrum';
 const TRAITS_COLORTEMP = 'action.devices.traits.ColorTemperature';
 const TRAITS_TEMPSETTING = 'action.devices.traits.TemperatureSetting';
+
 
 const fetch = require('node-fetch');
 const https = require('https');
@@ -171,8 +173,11 @@ function getSmartHomeDeviceProperties(thing) {
   switch (thing.type) {
   case 'onOffSwitch':
   case 'multilevelSwitch': // limitation: only support on property
-  case 'smartPlug': // limitation: only support on property
     device.type = TYPE_SWITCH;
+    device.traits.push(TRAITS_ONOFF);
+    break;
+  case 'smartPlug': // limitation: only support on property
+    device.type = TYPE_OUTLET;
     device.traits.push(TRAITS_ONOFF);
     break;
   case 'onOffLight':
@@ -197,7 +202,6 @@ function getSmartHomeDeviceProperties(thing) {
     device.traits.push(TRAITS_BRIGHTNESS);
     device.attributes['colorModel'] = 'rgb';
     break;
-
   case 'thing':
     // thermostat
     if (thing.properties.hasOwnProperty('mode') &&
