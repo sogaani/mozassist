@@ -44,6 +44,19 @@ const iotOptions = {
   body: '',
 };
 
+const timeoutOptions = {
+  method : 'PUT',
+  agent  : keepAliveAgent,
+  headers: {
+    'Connection'   : 'keep-alive',
+    'Authorization': '',
+    'Accept'       : 'application/json',
+    'Content-Type' : 'application/json',
+  },
+  timeout: 10000,
+  body: '',
+};
+
 function hex2number(colorString) {
   const color = colorString.replace('#', '');
   const colorN = parseInt(color, 16);
@@ -100,6 +113,32 @@ async function getThings(client, deviceList) {
   } catch (err) {
     console.log(err);
     throw new Error(`getThings failed url:${thingsUrl}`);
+  }
+}
+
+async function checkThingOnline(client, thing, property, current) {
+  if (!thing || !thing.properties || !thing.properties[property]) {
+    throw new Error('thing dose not have property: ' + property);
+  }
+
+  timeoutOptions.headers.Authorization = 'Bearer ' + client.token;
+
+  const body = {};
+  body[property] = current;
+
+  timeoutOptions.body = JSON.stringify(body);
+
+  const propertyUrl = util.format('%s%s', client.gateway, thing.properties[property].href);
+
+  try {
+    const res = await fetch(propertyUrl, timeoutOptions);
+
+    const json = await res.json();
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
   }
 }
 
@@ -310,7 +349,11 @@ async function getSmartHomeDeviceStates(client, thing) {
     case 'multilevelSwitch': // limitation: only support on property
     case 'smartPlug': // limitation: only support on property
     case 'onOffLight':
-      states['on'] = await getThingState(client, thing, 'on');
+      {
+        const on = await getThingState(client, thing, 'on');
+        states['on'] = on;
+        states.online = await checkThingOnline(client, thing, 'on', on);
+      }
       break;
     case 'dimmableLight':
       {
@@ -320,6 +363,7 @@ async function getSmartHomeDeviceStates(client, thing) {
 
         states['on'] = on;
         states['brightness'] = brightness;
+        states.online = await checkThingOnline(client, thing, 'on', on);
       }
       break;
     case 'onOffColorLight':
@@ -334,6 +378,7 @@ async function getSmartHomeDeviceStates(client, thing) {
           spectrumRGB: hex2number(hex),
         };
         states['color'] = color;
+        states.online = await checkThingOnline(client, thing, 'on', on);
       }
       break;
     case 'dimmableColorLight':
@@ -351,6 +396,7 @@ async function getSmartHomeDeviceStates(client, thing) {
           spectrumRGB: hex2number(hex),
         };
         states['color'] = color;
+        states.online = await checkThingOnline(client, thing, 'on', on);
       }
       break;
 
