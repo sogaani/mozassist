@@ -41,6 +41,7 @@ const iotOptions = {
     'Accept'       : 'application/json',
     'Content-Type' : 'application/json',
   },
+  timeout: 10000,
   body: '',
 };
 
