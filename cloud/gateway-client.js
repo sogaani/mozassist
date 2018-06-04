@@ -212,6 +212,13 @@ function getSmartHomeDeviceProperties(thing) {
 
   switch (thing.type) {
   case 'onOffSwitch':
+    if(getThingId(thing).match(/^tplink-/)) {
+      device.type = TYPE_OUTLET;
+    } else {
+      device.type = TYPE_SWITCH;
+    }
+    device.traits.push(TRAITS_ONOFF);
+    break;
   case 'multilevelSwitch': // limitation: only support on property
     device.type = TYPE_SWITCH;
     device.traits.push(TRAITS_ONOFF);
