@@ -20,7 +20,7 @@ async function requestSync(id) {
   options.body = JSON.stringify(optBody);
 
   try {
-    const syncUrl = requestSyncEndpoint + config.homeGraphApiKey;
+    const syncUrl = requestSyncEndpoint + config.smartHomeProviderApiKey;
     await fetch(syncUrl, options);
   } catch (e) {
     console.error('POST REQUEST_SYNC: failed', e);

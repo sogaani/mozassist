@@ -3,6 +3,7 @@
 const gatewayClient = require('./gateway-client');
 const auth = require('./auth-provider');
 const datastore = require('./datastore');
+const {requestSync} = require('./home-graph');
 
 datastore.open();
 
@@ -478,7 +479,7 @@ function registerAgent(app) {
     };
 
     DEBUG && console.log('exec response', JSON.stringify(resBody));
-
+    setTimeout(requestSync, 2000, auth.gatewayToId(client.gateway));
     response.status(200).json(resBody);
     return;
   }
