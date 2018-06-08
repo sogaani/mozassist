@@ -3,7 +3,7 @@
 const gatewayClient = require('./gateway-client');
 const auth = require('./auth-provider');
 const datastore = require('./datastore');
-const {requestSync} = require('./home-graph');
+const {requestSync, reportState} = require('./home-graph');
 
 datastore.open();
 
@@ -446,12 +446,13 @@ function registerAgent(app) {
 
       return new Promise(async (resolve) => {
         try {
-          const states = await gatewayClient.smartHomeExec(client, deviceIds, exec);
+          const {devices, query} = await gatewayClient.smartHomeExec(client, deviceIds, exec);
 
+          reportState(auth.gatewayToId(client.gateway), data.requestId, devices);
           resolve({
             ids      : deviceIds,
             status   : 'SUCCESS',
-            states   : states,
+            states   : query,
             errorCode: undefined,
           });
         } catch (error) {
@@ -479,7 +480,7 @@ function registerAgent(app) {
     };
 
     DEBUG && console.log('exec response', JSON.stringify(resBody));
-    setTimeout(requestSync, 2000, auth.gatewayToId(client.gateway));
+    // setTimeout(requestSync, 2000, auth.gatewayToId(client.gateway));
     response.status(200).json(resBody);
     return;
   }

@@ -56,7 +56,7 @@ class Database {
       const result = await doc.create(gateway);
       return result;
     } catch (e) {
-      throw new Error(`Document already exists id:${key}`);
+      throw new Error(`Document already exists id:${key}`, e);
     }
   }
 

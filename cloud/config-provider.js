@@ -2,7 +2,7 @@
 
 let option;
 try {
-  option = require('../config.json');
+  option = require('../config.staging.json');
 } catch (e) {
   if (e.code !== 'MODULE_NOT_FOUND') {
     throw e;

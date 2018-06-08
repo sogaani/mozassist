@@ -17,42 +17,42 @@ const https = require('https');
 const util = require('util');
 
 const keepAliveAgent = new https.Agent({
-  keepAlive     : false,
+  keepAlive: false,
   keepAliveMsecs: 1500,
-  maxSockets    : 70,
+  maxSockets: 70,
 });
 
 const thingsOptions = {
-  method : 'GET',
-  agent  : keepAliveAgent,
+  method: 'GET',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
+    'Connection': 'keep-alive',
     'Authorization': '',
-    'Accept'       : 'application/json',
+    'Accept': 'application/json',
   },
 };
 
 const iotOptions = {
-  method : 'PUT',
-  agent  : keepAliveAgent,
+  method: 'PUT',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
+    'Connection': 'keep-alive',
     'Authorization': '',
-    'Accept'       : 'application/json',
-    'Content-Type' : 'application/json',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
   },
   timeout: 10000,
   body: '',
 };
 
 const timeoutOptions = {
-  method : 'PUT',
-  agent  : keepAliveAgent,
+  method: 'PUT',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
+    'Connection': 'keep-alive',
     'Authorization': '',
-    'Accept'       : 'application/json',
-    'Content-Type' : 'application/json',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
   },
   timeout: 10000,
   body: '',
@@ -192,76 +192,76 @@ async function setThingState(client, thing, property, state) {
 
 function getSmartHomeDeviceProperties(thing) {
   const device = {
-    id    : null,
-    type  : null,
+    id: null,
+    type: null,
     traits: [],
-    name  : {
+    name: {
       // defaultNames: [thing.name],
       name: thing.name,
       // nicknames: [thing.name]
     },
-    willReportState: false,
-    attributes     : {},
-    deviceInfo     : {
+    willReportState: true,
+    attributes: {},
+    deviceInfo: {
       manufacturer: 'mozilla',
-      model       : 'gateway',
-      hwVersion   : '1.0',
-      swVersion   : '1.0',
+      model: 'gateway',
+      hwVersion: '1.0',
+      swVersion: '1.0',
     },
   };
 
   switch (thing.type) {
-  case 'onOffSwitch':
-    if(getThingId(thing).match(/^tplink-/)) {
-      device.type = TYPE_OUTLET;
-    } else {
+    case 'onOffSwitch':
+      if (getThingId(thing).match(/^tplink-/)) {
+        device.type = TYPE_OUTLET;
+      } else {
+        device.type = TYPE_SWITCH;
+      }
+      device.traits.push(TRAITS_ONOFF);
+      break;
+    case 'multilevelSwitch': // limitation: only support on property
       device.type = TYPE_SWITCH;
-    }
-    device.traits.push(TRAITS_ONOFF);
-    break;
-  case 'multilevelSwitch': // limitation: only support on property
-    device.type = TYPE_SWITCH;
-    device.traits.push(TRAITS_ONOFF);
-    break;
-  case 'smartPlug': // limitation: only support on property
-    device.type = TYPE_OUTLET;
-    device.traits.push(TRAITS_ONOFF);
-    break;
-  case 'onOffLight':
-    device.type = TYPE_LIGHT;
-    device.traits.push(TRAITS_ONOFF);
-    break;
-  case 'dimmableLight':
-    device.type = TYPE_LIGHT;
-    device.traits.push(TRAITS_ONOFF);
-    device.traits.push(TRAITS_BRIGHTNESS);
-    break;
-  case 'onOffColorLight':
-    device.type = TYPE_LIGHT;
-    device.traits.push(TRAITS_ONOFF);
-    device.traits.push(TRAITS_COLORSPEC);
-    device.attributes['colorModel'] = 'rgb';
-    break;
-  case 'dimmableColorLight':
-    device.type = TYPE_LIGHT;
-    device.traits.push(TRAITS_ONOFF);
-    device.traits.push(TRAITS_COLORSPEC);
-    device.traits.push(TRAITS_BRIGHTNESS);
-    device.attributes['colorModel'] = 'rgb';
-    break;
-  case 'thing':
-    // thermostat
-    if (thing.properties.hasOwnProperty('mode') &&
+      device.traits.push(TRAITS_ONOFF);
+      break;
+    case 'smartPlug': // limitation: only support on property
+      device.type = TYPE_OUTLET;
+      device.traits.push(TRAITS_ONOFF);
+      break;
+    case 'onOffLight':
+      device.type = TYPE_LIGHT;
+      device.traits.push(TRAITS_ONOFF);
+      break;
+    case 'dimmableLight':
+      device.type = TYPE_LIGHT;
+      device.traits.push(TRAITS_ONOFF);
+      device.traits.push(TRAITS_BRIGHTNESS);
+      break;
+    case 'onOffColorLight':
+      device.type = TYPE_LIGHT;
+      device.traits.push(TRAITS_ONOFF);
+      device.traits.push(TRAITS_COLORSPEC);
+      device.attributes['colorModel'] = 'rgb';
+      break;
+    case 'dimmableColorLight':
+      device.type = TYPE_LIGHT;
+      device.traits.push(TRAITS_ONOFF);
+      device.traits.push(TRAITS_COLORSPEC);
+      device.traits.push(TRAITS_BRIGHTNESS);
+      device.attributes['colorModel'] = 'rgb';
+      break;
+    case 'thing':
+      // thermostat
+      if (thing.properties.hasOwnProperty('mode') &&
         thing.properties.hasOwnProperty('temperature')) {
-      device.type = TYPE_THERMOSTAT;
-      device.traits.push(TRAITS_TEMPSETTING);
-      device.attributes['availableThermostatModes'] = 'off,heat,cool,on';
-      device.attributes['thermostatTemperatureUnit'] = 'C';
-    }
-    break;
-  default:
-    // do nothing
-    break;
+        device.type = TYPE_THERMOSTAT;
+        device.traits.push(TRAITS_TEMPSETTING);
+        device.attributes['availableThermostatModes'] = 'off,heat,cool,on';
+        device.attributes['thermostatTemperatureUnit'] = 'C';
+      }
+      break;
+    default:
+      // do nothing
+      break;
   }
 
   return device;
@@ -270,73 +270,73 @@ function getSmartHomeDeviceProperties(thing) {
 async function changeSmartHomeDeviceStates(client, thing, states) {
   try {
     switch (thing.type) {
-    case 'onOffSwitch':
-    case 'multilevelSwitch': // limitation: only support on property
-    case 'smartPlug': // limitation: only support on property
-    case 'onOffLight':
-      if (states.hasOwnProperty('on'))
-        await setThingState(client, thing, 'on', states['on']);
+      case 'onOffSwitch':
+      case 'multilevelSwitch': // limitation: only support on property
+      case 'smartPlug': // limitation: only support on property
+      case 'onOffLight':
+        if (states.hasOwnProperty('on'))
+          await setThingState(client, thing, 'on', states['on']);
 
-      break;
+        break;
 
-    case 'dimmableLight':
-      if (states.hasOwnProperty('on'))
-        await setThingState(client, thing, 'on', states['on']);
+      case 'dimmableLight':
+        if (states.hasOwnProperty('on'))
+          await setThingState(client, thing, 'on', states['on']);
 
-      if (states.hasOwnProperty('brightness'))
-        await setThingState(client, thing, 'level', states['brightness']);
+        if (states.hasOwnProperty('brightness'))
+          await setThingState(client, thing, 'level', states['brightness']);
 
-      if (states.hasOwnProperty('brightnessRelativeWeight')) {
-        const current = await getThingState(client, thing, 'level');
-        const target = current + states['brightnessRelativeWeight'];
-        await setThingState(client, thing, 'level', target);
-      }
-      break;
-
-    case 'onOffColorLight':
-      if (states.hasOwnProperty('on'))
-        await setThingState(client, thing, 'on', states['on']);
-
-      if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
-        const color = number2hex(states['color'].spectrumRGB);
-        await setThingState(client, thing, 'color', color);
-      }
-      break;
-
-    case 'dimmableColorLight':
-      if (states.hasOwnProperty('on'))
-        await setThingState(client, thing, 'on', states['on']);
-
-      if (states.hasOwnProperty('brightness'))
-        await setThingState(client, thing, 'level', states['brightness']);
-
-      if (states.hasOwnProperty('brightnessRelativeWeight')) {
-        const current = await getThingState(client, thing, 'level');
-        const target = current + states['brightnessRelativeWeight'];
-        await setThingState(client, thing, 'level', target);
-      }
-      if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
-        const color = number2hex(states['color'].spectrumRGB);
-        await setThingState(client, thing, 'color', color);
-      }
-      break;
-
-    case 'thing':
-      // thermostat
-      if (thing.properties.hasOwnProperty('mode') &&
-            thing.properties.hasOwnProperty('temperature')) {
-        if (states.hasOwnProperty('thermostatMode'))
-          await setThingState(client, thing, 'mode', states['thermostatMode']);
-
-        if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
-          const temperature = states['thermostatTemperatureSetpoint'];
-          await setThingState(client, thing, 'temperature', temperature);
+        if (states.hasOwnProperty('brightnessRelativeWeight')) {
+          const current = await getThingState(client, thing, 'level');
+          const target = current + states['brightnessRelativeWeight'];
+          await setThingState(client, thing, 'level', target);
         }
-      }
-      break;
-    default:
-      // do nothing
-      break;
+        break;
+
+      case 'onOffColorLight':
+        if (states.hasOwnProperty('on'))
+          await setThingState(client, thing, 'on', states['on']);
+
+        if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
+          const color = number2hex(states['color'].spectrumRGB);
+          await setThingState(client, thing, 'color', color);
+        }
+        break;
+
+      case 'dimmableColorLight':
+        if (states.hasOwnProperty('on'))
+          await setThingState(client, thing, 'on', states['on']);
+
+        if (states.hasOwnProperty('brightness'))
+          await setThingState(client, thing, 'level', states['brightness']);
+
+        if (states.hasOwnProperty('brightnessRelativeWeight')) {
+          const current = await getThingState(client, thing, 'level');
+          const target = current + states['brightnessRelativeWeight'];
+          await setThingState(client, thing, 'level', target);
+        }
+        if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
+          const color = number2hex(states['color'].spectrumRGB);
+          await setThingState(client, thing, 'color', color);
+        }
+        break;
+
+      case 'thing':
+        // thermostat
+        if (thing.properties.hasOwnProperty('mode') &&
+          thing.properties.hasOwnProperty('temperature')) {
+          if (states.hasOwnProperty('thermostatMode'))
+            await setThingState(client, thing, 'mode', states['thermostatMode']);
+
+          if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
+            const temperature = states['thermostatTemperatureSetpoint'];
+            await setThingState(client, thing, 'temperature', temperature);
+          }
+        }
+        break;
+      default:
+        // do nothing
+        break;
     }
   } catch (err) {
     console.error('changeSmartHomeDeviceStates fail:', err);
@@ -353,77 +353,77 @@ async function getSmartHomeDeviceStates(client, thing) {
 
   try {
     switch (thing.type) {
-    case 'onOffSwitch':
-    case 'multilevelSwitch': // limitation: only support on property
-    case 'smartPlug': // limitation: only support on property
-    case 'onOffLight':
-      {
-        const on = await getThingState(client, thing, 'on');
-        states['on'] = on;
-        states.online = await checkThingOnline(client, thing, 'on', on);
-      }
-      break;
-    case 'dimmableLight':
-      {
-        const [on, brightness] = await Promise.all([
-          getThingState(client, thing, 'on'),
-          getThingState(client, thing, 'level')]);
+      case 'onOffSwitch':
+      case 'multilevelSwitch': // limitation: only support on property
+      case 'smartPlug': // limitation: only support on property
+      case 'onOffLight':
+        {
+          const on = await getThingState(client, thing, 'on');
+          states['on'] = on;
+          states.online = await checkThingOnline(client, thing, 'on', on);
+        }
+        break;
+      case 'dimmableLight':
+        {
+          const [on, brightness] = await Promise.all([
+            getThingState(client, thing, 'on'),
+            getThingState(client, thing, 'level')]);
 
-        states['on'] = on;
-        states['brightness'] = brightness;
-        states.online = await checkThingOnline(client, thing, 'on', on);
-      }
-      break;
-    case 'onOffColorLight':
-      {
-        const [on, hex] = await Promise.all([
-          getThingState(client, thing, 'on'),
-          getThingState(client, thing, 'color')]);
+          states['on'] = on;
+          states['brightness'] = brightness;
+          states.online = await checkThingOnline(client, thing, 'on', on);
+        }
+        break;
+      case 'onOffColorLight':
+        {
+          const [on, hex] = await Promise.all([
+            getThingState(client, thing, 'on'),
+            getThingState(client, thing, 'color')]);
 
-        states['on'] = on;
+          states['on'] = on;
 
-        const color = {
-          spectrumRGB: hex2number(hex),
-        };
-        states['color'] = color;
-        states.online = await checkThingOnline(client, thing, 'on', on);
-      }
-      break;
-    case 'dimmableColorLight':
-      {
-        const [on, brightness, hex] = await Promise.all([
-          getThingState(client, thing, 'on'),
-          getThingState(client, thing, 'level'),
-          getThingState(client, thing, 'color'),
-        ]);
+          const color = {
+            spectrumRGB: hex2number(hex),
+          };
+          states['color'] = color;
+          states.online = await checkThingOnline(client, thing, 'on', on);
+        }
+        break;
+      case 'dimmableColorLight':
+        {
+          const [on, brightness, hex] = await Promise.all([
+            getThingState(client, thing, 'on'),
+            getThingState(client, thing, 'level'),
+            getThingState(client, thing, 'color'),
+          ]);
 
-        states['on'] = on;
-        states['brightness'] = brightness;
+          states['on'] = on;
+          states['brightness'] = brightness;
 
-        const color = {
-          spectrumRGB: hex2number(hex),
-        };
-        states['color'] = color;
-        states.online = await checkThingOnline(client, thing, 'on', on);
-      }
-      break;
+          const color = {
+            spectrumRGB: hex2number(hex),
+          };
+          states['color'] = color;
+          states.online = await checkThingOnline(client, thing, 'on', on);
+        }
+        break;
 
-    case 'thing':
-      // thermostat
-      if (thing.properties.hasOwnProperty('mode') &&
+      case 'thing':
+        // thermostat
+        if (thing.properties.hasOwnProperty('mode') &&
           thing.properties.hasOwnProperty('temperature')) {
-        const [mode, temperature] = await Promise.all([
-          getThingState(client, thing, 'mode'),
-          getThingState(client, thing, 'temperature'),
-        ]);
+          const [mode, temperature] = await Promise.all([
+            getThingState(client, thing, 'mode'),
+            getThingState(client, thing, 'temperature'),
+          ]);
 
-        states['thermostatMode'] = mode;
-        states['thermostatTemperatureSetpoint'] = temperature;
-      }
-      break;
-    default:
-      // do nothing
-      break;
+          states['thermostatMode'] = mode;
+          states['thermostatTemperatureSetpoint'] = temperature;
+        }
+        break;
+      default:
+        // do nothing
+        break;
     }
   } catch (err) {
     console.error('getSmartHomeDeviceStates fail:', err);
@@ -557,7 +557,7 @@ async function smartHomeGetDevices(client, deviceList = null) {
 async function smartHomeGetStates(client, deviceList = null) {
   const things = await getThings(client, deviceList);
 
-  const results = await Promise.all(things.map(function(thing) {
+  const results = await Promise.all(things.map(function (thing) {
     return getSmartHomeDeviceStates(client, thing);
   }));
 
@@ -597,18 +597,26 @@ async function smartHomeGetStates(client, deviceList = null) {
 async function smartHomeExec(client, deviceList, exec) {
   const things = await getThings(client, deviceList);
 
-  let states = {};
+  let query = {};
 
   for (let i = 0; i < exec.length; i++) {
-    states = Object.assign(states, exec[i].params);
+    query = Object.assign(query, exec[i].params);
   }
 
-  await Promise.all(things.map(function(thing) {
-    return changeSmartHomeDeviceStates(client, thing, states);
+  const results = await Promise.all(things.map(function (thing) {
+    return changeSmartHomeDeviceStates(client, thing, query);
   }));
 
+  let devices = {};
+  for (let i = 0; i < results.length; i++) {
+    const thing = things[i];
+    const thingId = getThingId(thing);
+    const states = results[i];
+    devices[thingId] = states;
+  }
+
   // TODO return current states
-  return states;
+  return {devices, query};
 }
 
 exports.smartHomeGetDevices = smartHomeGetDevices;
