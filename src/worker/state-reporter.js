@@ -7,7 +7,11 @@ const WORKER_NAME = 'stateReporter';
 function shouldSync(prevStates, currentStates) {
   let changed = false;
   Object.keys(prevStates).forEach(key => {
-    if (prevStates[key].online !== currentStates[key].online) {
+    if (
+      prevStates.hasOwnProperty(key) &&
+      currentStates.hasOwnProperty(key) &&
+      prevStates[key].online !== currentStates[key].online
+    ) {
       changed = true;
     }
   });

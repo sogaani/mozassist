@@ -47,6 +47,10 @@ async function reportState(id, requestId, states) {
   Object.keys(states).forEach(key => {
     if (states[key].online) {
       reportStates[key] = states[key];
+    } else {
+      reportStates[key] = {
+        online: false,
+      };
     }
   });
 
