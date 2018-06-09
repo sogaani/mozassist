@@ -5,18 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "npm run bower && npm run minfy",
-    "build": "npm run lint && npm run minfy",
+    "build": "npm run lint",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "bower": "cd static && bower install",
-    "minfy": "cd static && polymer build"
+    "lint:fix": "eslint . --fix"
+    
   },
   "keywords": [
     "mozilla",
     "iot",
-    "adapter",
-    "broadlink"
+    "adapter"
   ],
   "homepage": "https://github.com/sogaani/mozassist",
   "license": "MPL-2.0",
@@ -30,15 +27,13 @@
   "dependencies": {
     "agenda": "^1.0.3",
     "agendash": "^0.4.0",
-    "bower": "^1.8.2",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "firebase-admin": "^5.11.0",
     "googleapis": "^31.0.2",
     "morgan": "^1.9.0",
     "ngrok": "^2.2.26",
-    "node-fetch": "^1.6.3",
-    "polymer-cli": "^1.6.0"
+    "node-fetch": "^1.6.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

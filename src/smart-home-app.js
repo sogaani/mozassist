@@ -70,7 +70,7 @@ function createApp(config) {
 
 const app = createApp(config);
 
-app.use('/static/', express.static(__dirname + '/../static/build/default'));
+app.use('/static/', express.static(__dirname + '/../static/'));
 
 smarthomeController.registerAgent(app);
 oauthController.registerAuth(app);

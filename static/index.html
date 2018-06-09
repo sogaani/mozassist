@@ -9,23 +9,16 @@
 	<meta name="description" content="Connect Google Home and Mozilla Things Gateway">
 
 	<link rel="icon" href="images/favicon.ico">
-
-	<script>
-		// Setup Polymer options
-		window.Polymer = {
-			dom: 'shadow',
-			lazyRegister: true
-		};
-	</script>
-
-	<script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-
-	<link rel="import" href="imports.html">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- Bootstrap core CSS -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Material Design Bootstrap -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.4/css/mdb.min.css" rel="stylesheet">
 
 	<style>
 		body {
 			margin: 0;
-			font-family: 'Roboto', 'Noto', sans-serif;
 			line-height: 1.5;
 			min-height: 100vh;
 			background-color: #fafafa;
@@ -43,6 +36,13 @@
 		}
 
 		div.main>h1 {
+			display: block;
+			font-size: 2em;
+			-webkit-margin-before: 0.67em;
+			-webkit-margin-after: 0.67em;
+			-webkit-margin-start: 0px;
+			-webkit-margin-end: 0px;
+			font-weight: bold;
 			margin-left: 10%;
 			margin-right: 10%;
 			text-align: left;
@@ -50,14 +50,25 @@
 			border-bottom: 2px solid #050505;
 		}
 
-		paper-input {
-			box-sizing: border-box;
+		form {
+			text-align: center
+		}
+
+		.md-form label {
+			position: static
+		}
+
+		.md-form .form-control {
+			padding: 0;
+		}
+
+		.md-form {
 			width: 80%;
 			margin-left: 10%;
 			text-align: left;
 		}
 
-		paper-button {
+		button {
 			margin-left: 10%;
 			margin-top: 40px;
 			color: white;
@@ -89,16 +100,27 @@
 
 
 		<form action='/gateway/oauth' method='get' id='connectform'>
-			<paper-input always-float-label label="Domain" name="paper_gateway_domain">
-				<div slot="suffix">.mozilla-iot.org</div>
-			</paper-input>
-			<paper-input always-float-label label="Client Id" name="paper_gateway_client_id">
-			</paper-input>
+			<!-- Material input -->
+			<div class="md-form">
+				<label for="gateway_domain" >Domain</label>
+				<div class="input-group suffix">
+					<input type="text" id="gateway_domain" class="form-control" >
+					<span class="input-group-addon ">.mozilla-iot.org</span>
+				</div>
+			</div>
+			<div class="md-form">
+				<label for="gateway_client_id" >Client Id</label>
+				<input type="text" id="gateway_client_id" class="form-control">
+			</div>
+			<div class="md-form">
+				<label for="gateway_client_secret" >Client Secret</label>
+				<input type="text" id="gateway_client_secret" class="form-control">
+			</div>
 			<paper-input always-float-label label="Client Secret" type="password" name="paper_gateway_client_secret">
 				<iron-icon icon="communication:vpn-key" slot="suffix"></iron-icon>
 			</paper-input>
 
-			<paper-button raised onclick="formSubmit()">Connect</paper-button>
+			<button class="btn" onclick="formSubmit()">Connect</button>
 
 			<input type="hidden" name="domain">
 			<input type="hidden" name="client_id">
@@ -131,9 +153,9 @@
 			// Get URL parameters
 			const params = getUrlParameters();
 			// Set each hidden input from a value obtained from the URL
-			document.querySelector('[name="domain"]').value = document.querySelector('paper-input[name="paper_gateway_domain"]').value;
-			document.querySelector('[name="client_id"]').value = document.querySelector('paper-input[name="paper_gateway_client_id"]').value;
-			document.querySelector('[name="client_secret"]').value = document.querySelector('paper-input[name="paper_gateway_client_secret"]').value;
+			document.querySelector('[name="domain"]').value = document.querySelector('#gateway_domain').value;
+			document.querySelector('[name="client_id"]').value = document.querySelector('#gateway_client_id').value;
+			document.querySelector('[name="client_secret"]').value = document.querySelector('#gateway_client_secret').value;
 			document.querySelector('[name="redirect_uri"]').value = params.get('redirect_uri');
 			document.querySelector('[name="state"]').value = params.get('state');
 			document.querySelector('[name="response_type"]').value = params.get('response_type');
