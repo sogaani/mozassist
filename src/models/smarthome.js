@@ -74,14 +74,14 @@ function getSmartHomeDeviceProperties(gateway, thing) {
       device.type = TYPE_LIGHT;
       device.traits.push(TRAITS_ONOFF);
       device.traits.push(TRAITS_COLORSPEC);
-      device.attributes['colorModel'] = 'rgb';
+      device.attributes.colorModel = 'rgb';
       break;
     case 'dimmableColorLight':
       device.type = TYPE_LIGHT;
       device.traits.push(TRAITS_ONOFF);
       device.traits.push(TRAITS_COLORSPEC);
       device.traits.push(TRAITS_BRIGHTNESS);
-      device.attributes['colorModel'] = 'rgb';
+      device.attributes.colorModel = 'rgb';
       break;
     case 'thing':
       // thermostat
@@ -91,8 +91,8 @@ function getSmartHomeDeviceProperties(gateway, thing) {
       ) {
         device.type = TYPE_THERMOSTAT;
         device.traits.push(TRAITS_TEMPSETTING);
-        device.attributes['availableThermostatModes'] = 'off,heat,cool,on';
-        device.attributes['thermostatTemperatureUnit'] = 'C';
+        device.attributes.availableThermostatModes = 'off,heat,cool,on';
+        device.attributes.thermostatTemperatureUnit = 'C';
       }
       break;
     default:
@@ -138,7 +138,7 @@ async function changeSmartHomeDeviceStates(gateway, thing, states) {
 
         if (states.hasOwnProperty('brightnessRelativeWeight')) {
           const current = await gateway.getThingState(thing, 'level');
-          const target = current + states['brightnessRelativeWeight'];
+          const target = current + states.brightnessRelativeWeight;
           currentStates.brightness = await gateway.setThingState(
             thing,
             'level',
@@ -169,21 +169,34 @@ async function changeSmartHomeDeviceStates(gateway, thing, states) {
 
       case 'dimmableColorLight':
         if (states.hasOwnProperty('on'))
-          await gateway.setThingState(thing, 'on', states['on']);
+          currentStates.on = await gateway.setThingState(
+            thing,
+            'on',
+            states['on']
+          );
 
         if (states.hasOwnProperty('brightness'))
-          await gateway.setThingState(thing, 'level', states['brightness']);
+          currentStates.brightness = await gateway.setThingState(
+            thing,
+            'level',
+            states.brightness
+          );
 
         if (states.hasOwnProperty('brightnessRelativeWeight')) {
           const current = await gateway.getThingState(thing, 'level');
-          const target = current + states['brightnessRelativeWeight'];
-          await gateway.setThingState(thing, 'level', target);
+          const target = current + states.brightnessRelativeWeight;
+          currentStates.brightness = await gateway.setThingState(
+            thing,
+            'level',
+            target
+          );
         }
+
         if (
           states.hasOwnProperty('color') &&
           states.color.hasOwnProperty('spectrumRGB')
         ) {
-          const color = number2hex(states['color'].spectrumRGB);
+          const color = number2hex(states.color.spectrumRGB);
           const hex = await gateway.setThingState(thing, 'color', color);
           currentStates.color = {
             spectrumRGB: hex2number(hex),
@@ -201,11 +214,11 @@ async function changeSmartHomeDeviceStates(gateway, thing, states) {
             currentStates.thermostatMode = await gateway.setThingState(
               thing,
               'mode',
-              states['thermostatMode']
+              states.thermostatMode
             );
 
           if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
-            const temperature = states['thermostatTemperatureSetpoint'];
+            const temperature = states.thermostatTemperatureSetpoint;
             currentStates.thermostatTemperatureSetpoint = await gateway.setThingState(
               thing,
               'temperature',
