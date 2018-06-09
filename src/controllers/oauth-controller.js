@@ -2,22 +2,14 @@
 
 const util = require('util');
 const fetch = require('node-fetch');
-const config = require('./config-provider');
-const datastore = require('./datastore');
+const config = require('../config-provider');
+const datastore = require('../datastore');
 const url = require('url');
-const {requestSync} = require('./home-graph');
+const {requestSync} = require('../home-graph');
 
 datastore.open();
 
 const DEBUG = true;
-
-function gatewayToId(gateway) {
-  return new Buffer(gateway).toString('base64');
-}
-
-function getAccessToken(request) {
-  return request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-}
 
 function registerAuth(app) {
   // 1. Assistant App try to be authorized.
@@ -71,7 +63,7 @@ function registerAuth(app) {
       redirect_uri : redirect_uri,
     };
 
-    try{
+    try {
       await datastore.registerGatewayWithState(state, client);
     } catch (err) {
       console.error(err);
@@ -106,7 +98,7 @@ function registerAuth(app) {
       console.error('have not connect gateway');
       return res.status(400).send('have not connect gateway');
     }
-    try{
+    try {
       await datastore.registerGatewayWithState(code, client);
     } catch (err) {
       console.error(err);
@@ -188,8 +180,6 @@ function registerAuth(app) {
 
       await datastore.registerGatewayWithToken(token, client);
 
-      setTimeout(requestSync, 2000, gatewayToId(client.gateway));
-
       return res.json(json);
     } catch (err) {
       console.error(err);
@@ -199,5 +189,3 @@ function registerAuth(app) {
 }
 
 exports.registerAuth = registerAuth;
-exports.getAccessToken = getAccessToken;
-exports.gatewayToId = gatewayToId;

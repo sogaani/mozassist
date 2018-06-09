@@ -1,9 +1,9 @@
 'use strict';
 
-const gatewayClient = require('./gateway-client');
-const auth = require('./auth-provider');
-const datastore = require('./datastore');
-const {requestSync, reportState} = require('./home-graph');
+const smarthome = require('../models/smarthome');
+const {getAccessToken, gatewayToId} = require('../utils');
+const datastore = require('../datastore');
+const {requestSync, reportState} = require('../home-graph');
 
 datastore.open();
 
@@ -28,7 +28,7 @@ function registerAgent(app) {
    */
   app.post('/smarthome', async function(request, response) {
     const reqdata = request.body;
-    const authToken = auth.getAccessToken(request);
+    const authToken = getAccessToken(request);
 
     DEBUG && console.log('smarthome', reqdata);
 
@@ -254,7 +254,7 @@ function registerAgent(app) {
    * }
    */
   async function sync(client, data, response) {
-    const devices = await gatewayClient.smartHomeGetDevices(client);
+    const devices = await smarthome.smartHomeGetDevices(client);
 
     if (!devices) {
       response.status(500).set({
@@ -279,7 +279,7 @@ function registerAgent(app) {
     const deviceProps = {
       requestId: data.requestId,
       payload  : {
-        agentUserId: auth.gatewayToId(client.gateway),
+        agentUserId: gatewayToId(client.gateway),
         devices    : deviceList,
       },
     };
@@ -336,7 +336,7 @@ function registerAgent(app) {
 
     const deviceIds = getDeviceIds(data.devices);
 
-    const devices = await gatewayClient.smartHomeGetStates(client, deviceIds);
+    const devices = await smarthome.smartHomeGetStates(client, deviceIds);
     if (!devices) {
       response.status(500).set({
         'Access-Control-Allow-Origin' : '*',
@@ -446,9 +446,9 @@ function registerAgent(app) {
 
       return new Promise(async (resolve) => {
         try {
-          const {devices, query} = await gatewayClient.smartHomeExec(client, deviceIds, exec);
+          const {devices, query} = await smarthome.smartHomeExec(client, deviceIds, exec);
 
-          reportState(auth.gatewayToId(client.gateway), data.requestId, devices);
+          reportState(gatewayToId(client.gateway), data.requestId, devices);
           resolve({
             ids      : deviceIds,
             status   : 'SUCCESS',

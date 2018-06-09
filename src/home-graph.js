@@ -2,15 +2,17 @@
 
 const fetch = require('node-fetch');
 const config = require('./config-provider');
-const { google } = require('googleapis');
+const {google} = require('googleapis');
 
-const requestSyncEndpoint = 'https://homegraph.googleapis.com/v1/devices:requestSync?key=';
-const reportStateEndpoint = 'https://homegraph.googleapis.com/v1/devices:reportStateAndNotification';
+const requestSyncEndpoint =
+  'https://homegraph.googleapis.com/v1/devices:requestSync?key=';
+const reportStateEndpoint =
+  'https://homegraph.googleapis.com/v1/devices:reportStateAndNotification';
 
 async function requestSync(id) {
   // REQUEST_SYNC
   const options = {
-    method: 'POST',
+    method : 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -41,18 +43,18 @@ async function reportState(id, requestId, states) {
   try {
     const tokens = await jwtClient.authorize();
     const options = {
-      method: 'POST',
+      method : 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: ` Bearer ${tokens.access_token}`,
+        'Content-Type' : 'application/json',
+        'Authorization': ` Bearer ${tokens.access_token}`,
       },
     };
     const optBody = {
-      requestId: requestId,
+      requestId  : requestId,
       agentUserId: id,
-      payload: {
+      payload    : {
         devices: {
-          states: states
+          states: states,
         },
       },
     };
@@ -67,7 +69,6 @@ async function reportState(id, requestId, states) {
     console.error('POST REPORT_STATE: failed', e);
   }
 }
-
 
 exports.requestSync = requestSync;
 exports.reportState = reportState;

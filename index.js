@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./cloud/smart-home-app');
+module.exports = require('./src/smart-home-app');

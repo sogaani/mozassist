@@ -4,7 +4,7 @@
   "description": "Google smart Home App for Mozilla IoT Gateway",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js isLocal",
+    "start": "node index.js",
     "postinstall": "npm run bower && npm run minfy",
     "build": "npm run lint && npm run minfy",
     "lint": "eslint .",
