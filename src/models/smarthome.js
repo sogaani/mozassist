@@ -239,7 +239,7 @@ async function getSmartHomeDeviceStates(gateway, thing) {
       case 'onOffLight':
         {
           const on = await gateway.getThingState(thing, 'on');
-          states['on'] = on;
+          states.on = on;
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
@@ -250,8 +250,8 @@ async function getSmartHomeDeviceStates(gateway, thing) {
             gateway.getThingState(thing, 'level'),
           ]);
 
-          states['on'] = on;
-          states['brightness'] = brightness;
+          states.on = on;
+          states.brightness = brightness;
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
@@ -262,12 +262,12 @@ async function getSmartHomeDeviceStates(gateway, thing) {
             gateway.getThingState(thing, 'color'),
           ]);
 
-          states['on'] = on;
+          states.on = on;
 
           const color = {
             spectrumRGB: hex2number(hex),
           };
-          states['color'] = color;
+          states.color = color;
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
@@ -279,13 +279,13 @@ async function getSmartHomeDeviceStates(gateway, thing) {
             gateway.getThingState(thing, 'color'),
           ]);
 
-          states['on'] = on;
-          states['brightness'] = brightness;
+          states.on = on;
+          states.brightness = brightness;
 
           const color = {
             spectrumRGB: hex2number(hex),
           };
-          states['color'] = color;
+          states.color = color;
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
@@ -301,8 +301,9 @@ async function getSmartHomeDeviceStates(gateway, thing) {
             gateway.getThingState(thing, 'temperature'),
           ]);
 
-          states['thermostatMode'] = mode;
-          states['thermostatTemperatureSetpoint'] = temperature;
+          states.thermostatMode = mode;
+          states.thermostatTemperatureSetpoint = temperature;
+          states.online = await gateway.checkThingOnline(thing, 'mode', mode);
         }
         break;
       default:

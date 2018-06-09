@@ -526,7 +526,7 @@ function registerAgent(app) {
                 ids: [deviceId],
                 status: 'OFFLINE',
                 states: devices[deviceId],
-                errorCode: undefined,
+                errorCode: 'deviceOffline',
               });
             }
           });
@@ -537,11 +537,11 @@ function registerAgent(app) {
           resolve([
             {
               ids: deviceIds,
-              status: 'OFFLINE',
+              status: 'ERROR',
               states: {
                 online: false,
               },
-              errorCode: error,
+              errorCode: 'unknownError',
             },
           ]);
         }
