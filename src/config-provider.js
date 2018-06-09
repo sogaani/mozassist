@@ -12,6 +12,12 @@ try {
   if (option.googleServiceAccount) {
     option.googleServiceAccount = JSON.parse(option.googleServiceAccount);
   }
+  if (option.homeGraphServiceAccount) {
+    option.homeGraphServiceAccount = JSON.parse(option.homeGraphServiceAccount);
+  }
+  if (option.mongodb) {
+    option.mongodb = JSON.parse(option.mongodb);
+  }
 }
 
 var Config = {

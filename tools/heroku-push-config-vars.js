@@ -11,6 +11,12 @@ Object.keys(config).forEach(function(key) {
   if (key === 'googleServiceAccount') {
     value = JSON.stringify(value);
   }
+  if (key === 'homeGraphServiceAccount') {
+    value = JSON.stringify(value);
+  }
+  if (key === 'mongodb') {
+    value = JSON.stringify(value);
+  }
 
   args.push(`${key}=${value}`);
 });
