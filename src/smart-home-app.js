@@ -9,7 +9,9 @@ const session = require('express-session');
 // internal app deps
 const smarthomeController = require('./controllers/smart-home-controller');
 const oauthController = require('./controllers/oauth-controller');
+const stateReporter = require('./worker/state-reporter');
 const config = require('./config-provider');
+const scheduler = require('./scheduler');
 
 process.on('unhandledRejection', console.dir);
 
@@ -31,6 +33,7 @@ function createApp(config) {
     if (!config.isLocal) {
       return;
     }
+    scheduler.createDashboard(app);
     ngrok.connect(config.devPort, function(err, url) {
       if (err) {
         console.log('ngrok err', err);
@@ -64,5 +67,7 @@ app.use('/static/', express.static(__dirname + '/../static/build/default'));
 
 smarthomeController.registerAgent(app);
 oauthController.registerAuth(app);
+stateReporter.registerWorker(scheduler);
+scheduler.startWorker();
 
 module.exports = app;

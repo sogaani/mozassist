@@ -3,6 +3,8 @@
 const smarthome = require('../models/smarthome');
 const {getAccessToken, gatewayToId} = require('../utils');
 const datastore = require('../datastore');
+const stateReporter = require('../worker/state-reporter');
+const scheduler = require('../scheduler');
 const {requestSync, reportState} = require('../home-graph');
 
 datastore.open();
@@ -69,14 +71,14 @@ function registerAgent(app) {
       case 'action.devices.SYNC':
         DEBUG && console.log('post /smarthome SYNC');
         /**
-                               * request:
-                               * {
-                               *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                               *  "inputs": [{
-                               *      "intent": "action.devices.SYNC",
-                               *  }]
-                               * }
-                               */
+         * request:
+         * {
+         *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+         *  "inputs": [{
+         *      "intent": "action.devices.SYNC",
+         *  }]
+         * }
+         */
         sync(client, {
           requestId: reqdata.requestId,
         }, response);
@@ -84,31 +86,31 @@ function registerAgent(app) {
       case 'action.devices.QUERY':
         DEBUG && console.log('post /smarthome QUERY');
         /**
-                               * request:
-                               * {
-                               *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                               *   "inputs": [{
-                               *       "intent": "action.devices.QUERY",
-                               *       "payload": {
-                               *          "devices": [{
-                               *            "id": "123",
-                               *            "customData": {
-                               *              "fooValue": 12,
-                               *              "barValue": true,
-                               *              "bazValue": "alpaca sauce"
-                               *            }
-                               *          }, {
-                               *            "id": "234",
-                               *            "customData": {
-                               *              "fooValue": 74,
-                               *              "barValue": false,
-                               *              "bazValue": "sheep dip"
-                               *            }
-                               *          }]
-                               *       }
-                               *   }]
-                               * }
-                               */
+         * request:
+         * {
+         *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+         *   "inputs": [{
+         *       "intent": "action.devices.QUERY",
+         *       "payload": {
+         *          "devices": [{
+         *            "id": "123",
+         *            "customData": {
+         *              "fooValue": 12,
+         *              "barValue": true,
+         *              "bazValue": "alpaca sauce"
+         *            }
+         *          }, {
+         *            "id": "234",
+         *            "customData": {
+         *              "fooValue": 74,
+         *              "barValue": false,
+         *              "bazValue": "sheep dip"
+         *            }
+         *          }]
+         *       }
+         *   }]
+         * }
+         */
         query(client, {
           requestId: reqdata.requestId,
           devices  : reqdata.inputs[0].payload.devices,
@@ -118,44 +120,59 @@ function registerAgent(app) {
       case 'action.devices.EXECUTE':
         DEBUG && console.log('post /smarthome EXECUTE');
         /**
-                               * request:
-                               * {
-                               *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-                               *   "inputs": [{
-                               *     "intent": "action.devices.EXECUTE",
-                               *     "payload": {
-                               *       "commands": [{
-                               *         "devices": [{
-                               *           "id": "123",
-                               *           "customData": {
-                               *             "fooValue": 12,
-                               *             "barValue": true,
-                               *             "bazValue": "alpaca sauce"
-                               *           }
-                               *         }, {
-                               *           "id": "234",
-                               *           "customData": {
-                               *              "fooValue": 74,
-                               *              "barValue": false,
-                               *              "bazValue": "sheep dip"
-                               *           }
-                               *         }],
-                               *         "execution": [{
-                               *           "command": "action.devices.commands.OnOff",
-                               *           "params": {
-                               *             "on": true
-                               *           }
-                               *         }]
-                               *       }]
-                               *     }
-                               *   }]
-                               * }
-                               */
+         * request:
+         * {
+         *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+         *   "inputs": [{
+         *     "intent": "action.devices.EXECUTE",
+         *     "payload": {
+         *       "commands": [{
+         *         "devices": [{
+         *           "id": "123",
+         *           "customData": {
+         *             "fooValue": 12,
+         *             "barValue": true,
+         *             "bazValue": "alpaca sauce"
+         *           }
+         *         }, {
+         *           "id": "234",
+         *           "customData": {
+         *              "fooValue": 74,
+         *              "barValue": false,
+         *              "bazValue": "sheep dip"
+         *           }
+         *         }],
+         *         "execution": [{
+         *           "command": "action.devices.commands.OnOff",
+         *           "params": {
+         *             "on": true
+         *           }
+         *         }]
+         *       }]
+         *     }
+         *   }]
+         * }
+         */
         exec(client, {
           requestId: reqdata.requestId,
           commands : reqdata.inputs[0].payload.commands,
         }, response);
 
+        break;
+      case 'action.devices.DISCONNECT':
+        DEBUG && console.log('post /smarthome DISCONNECT');
+        /**
+         * request:
+         * {
+         *  "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
+         *  "inputs": [{
+         *      "intent": "action.devices.DISCONNECT",
+         *  }]
+         * }
+         */
+        disconnect(client, {
+          requestId: reqdata.requestId,
+        }, response);
         break;
       default:
         response.status(401).set({
@@ -265,6 +282,7 @@ function registerAgent(app) {
     }
 
     const deviceList = [];
+    const deviceIdList = [];
 
     Object.keys(devices).forEach(function(key) {
       if (devices.hasOwnProperty(key) && devices[key]) {
@@ -273,6 +291,7 @@ function registerAgent(app) {
         const device = devices[key];
         device.id = key;
         deviceList.push(device);
+        deviceIdList.push(key);
       }
     });
 
@@ -287,6 +306,7 @@ function registerAgent(app) {
     DEBUG && console.log('sync response', JSON.stringify(deviceProps, undefined, 1));
 
     response.status(200).json(deviceProps);
+    stateReporter.schedule(scheduler, client, deviceIdList);
     return;
   }
 
@@ -481,6 +501,29 @@ function registerAgent(app) {
 
     DEBUG && console.log('exec response', JSON.stringify(resBody));
     // setTimeout(requestSync, 2000, auth.gatewayToId(client.gateway));
+    response.status(200).json(resBody);
+    return;
+  }
+
+  /**
+   *
+   * @param client
+   * @param data:
+   * {
+   *   "requestId": "ff36a3cc-ec34-11e6-b1a0-64510650abcf"
+   * }
+   * @param response
+   */
+  async function disconnect(client, data, response) {
+    DEBUG && console.log('disconnect', JSON.stringify(data));
+
+    stateReporter.cancel(scheduler, client);
+
+    const resBody = {
+      requestId: data.requestId,
+    };
+
+    DEBUG && console.log('disconnect response', JSON.stringify(resBody));
     response.status(200).json(resBody);
     return;
   }

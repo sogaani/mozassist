@@ -9,6 +9,8 @@ const requestSyncEndpoint =
 const reportStateEndpoint =
   'https://homegraph.googleapis.com/v1/devices:reportStateAndNotification';
 
+const DEBUG = true;
+
 async function requestSync(id) {
   // REQUEST_SYNC
   const options = {
@@ -40,6 +42,8 @@ async function reportState(id, requestId, states) {
     null
   );
 
+  let isDisconnected = false;
+
   try {
     const tokens = await jwtClient.authorize();
     const options = {
@@ -60,14 +64,26 @@ async function reportState(id, requestId, states) {
     };
     options.body = JSON.stringify(optBody);
 
-    console.log(`POST REPORT_STATE: body:${options.body}`);
+    if (DEBUG) {
+      console.log(`POST REPORT_STATE: body:${options.body}`);
+    }
 
     const response = await fetch(reportStateEndpoint, options);
+
     const body = await response.text();
-    console.log(`POST REPORT_STATE: response:${body} status:${response.status}`);
+
+    if (body && body.error && body.error.message === 'Requested entity was not found.') {
+      isDisconnected = true;
+    }
+
+    if (DEBUG) {
+      console.log(`POST REPORT_STATE: response:${body} status:${response.status}`);
+    }
   } catch (e) {
     console.error('POST REPORT_STATE: failed', e);
   }
+
+  return {isDisconnected};
 }
 
 exports.requestSync = requestSync;
