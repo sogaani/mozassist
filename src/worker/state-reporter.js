@@ -1,6 +1,6 @@
-const {smartHomeGetStates} = require('../models/smarthome');
-const {gatewayToId} = require('../utils');
-const {reportState} = require('../home-graph');
+const { smartHomeGetStates } = require('../models/smarthome');
+const { gatewayToId } = require('../utils');
+const { reportState } = require('../home-graph');
 
 const WORKER_NAME = 'stateReporter';
 
@@ -11,7 +11,11 @@ function registerWorker(scheduler) {
     const requestId = 'mozassistRequest12398';
 
     const states = await smartHomeGetStates(client, deviceIdList);
-    const {isDisconnected} = await reportState(gatewayToId(client.gateway), requestId, states);
+    const { isDisconnected } = await reportState(
+      gatewayToId(client.gateway),
+      requestId,
+      states
+    );
 
     if (isDisconnected) {
       cancel(scheduler, client);
@@ -23,11 +27,15 @@ function registerWorker(scheduler) {
 
 function schedule(scheduler, client, deviceIdList) {
   const jobId = gatewayToId(client.gateway);
-  scheduler.repeatJob(WORKER_NAME, jobId, {
-    client      : client,
-    deviceIdList: deviceIdList,
-  },
-  {schedule: '5 minutes'});
+  scheduler.repeatJob(
+    WORKER_NAME,
+    jobId,
+    {
+      client: client,
+      deviceIdList: deviceIdList,
+    },
+    { schedule: '5 minutes' }
+  );
 }
 
 function cancel(scheduler, client) {

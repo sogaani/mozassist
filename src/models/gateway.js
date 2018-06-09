@@ -5,45 +5,45 @@ const https = require('https');
 const util = require('util');
 
 const keepAliveAgent = new https.Agent({
-  keepAlive     : false,
+  keepAlive: false,
   keepAliveMsecs: 1500,
-  maxSockets    : 70,
+  maxSockets: 70,
 });
 
 const thingsOptions = {
-  method : 'GET',
-  agent  : keepAliveAgent,
+  method: 'GET',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
-    'Authorization': '',
-    'Accept'       : 'application/json',
+    Connection: 'keep-alive',
+    Authorization: '',
+    Accept: 'application/json',
   },
 };
 
 const iotOptions = {
-  method : 'PUT',
-  agent  : keepAliveAgent,
+  method: 'PUT',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
-    'Authorization': '',
-    'Accept'       : 'application/json',
-    'Content-Type' : 'application/json',
+    Connection: 'keep-alive',
+    Authorization: '',
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
   },
   timeout: 10000,
-  body   : '',
+  body: '',
 };
 
 const timeoutOptions = {
-  method : 'PUT',
-  agent  : keepAliveAgent,
+  method: 'PUT',
+  agent: keepAliveAgent,
   headers: {
-    'Connection'   : 'keep-alive',
-    'Authorization': '',
-    'Accept'       : 'application/json',
-    'Content-Type' : 'application/json',
+    Connection: 'keep-alive',
+    Authorization: '',
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
   },
   timeout: 10000,
-  body   : '',
+  body: '',
 };
 
 class Gateway {
@@ -109,12 +109,16 @@ class Gateway {
 
     timeoutOptions.body = JSON.stringify(body);
 
-    const propertyUrl = util.format('%s%s', this.url, thing.properties[property].href);
+    const propertyUrl = util.format(
+      '%s%s',
+      this.url,
+      thing.properties[property].href
+    );
 
     try {
       const res = await fetch(propertyUrl, timeoutOptions);
 
-      const json = await res.json();
+      await res.json();
 
       return true;
     } catch (err) {
@@ -130,7 +134,11 @@ class Gateway {
 
     thingsOptions.headers.Authorization = 'Bearer ' + this.token;
 
-    const propertyUrl = util.format('%s%s', this.url, thing.properties[property].href);
+    const propertyUrl = util.format(
+      '%s%s',
+      this.url,
+      thing.properties[property].href
+    );
 
     try {
       const res = await fetch(propertyUrl, thingsOptions);
@@ -156,7 +164,11 @@ class Gateway {
 
     iotOptions.body = JSON.stringify(body);
 
-    const propertyUrl = util.format('%s%s', this.url, thing.properties[property].href);
+    const propertyUrl = util.format(
+      '%s%s',
+      this.url,
+      thing.properties[property].href
+    );
 
     try {
       const res = await fetch(propertyUrl, iotOptions);

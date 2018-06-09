@@ -3,7 +3,9 @@ function gatewayToId(gateway) {
 }
 
 function getAccessToken(request) {
-  return request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+  return request.headers.authorization
+    ? request.headers.authorization.split(' ')[1]
+    : null;
 }
 
 exports.getAccessToken = getAccessToken;

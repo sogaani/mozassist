@@ -5,7 +5,6 @@ const fetch = require('node-fetch');
 const config = require('../config-provider');
 const datastore = require('../datastore');
 const url = require('url');
-const {requestSync} = require('../home-graph');
 
 datastore.open();
 
@@ -21,21 +20,22 @@ function registerAuth(app) {
     const scope = req.query.scope;
 
     if ('code' != response_type)
-      return res.status(500).send('response_type ' + response_type + ' must equal "code"');
+      return res
+        .status(500)
+        .send('response_type ' + response_type + ' must equal "code"');
 
-    if (client_id !== config.clientId ||
-      redirect_uri !== config.redirectUrl) {
+    if (client_id !== config.clientId || redirect_uri !== config.redirectUrl) {
       console.error('incorrect client data');
       return res.status(400).send('incorrect client data');
     }
 
     const inputFormUrl = url.format({
       pathname: '/static',
-      query   : {
-        redirect_uri : redirect_uri,
+      query: {
+        redirect_uri: redirect_uri,
         response_type: response_type,
-        state        : state,
-        scope        : scope,
+        state: state,
+        scope: scope,
       },
     });
 
@@ -54,13 +54,15 @@ function registerAuth(app) {
     const scope = req.query.scope;
 
     if ('code' != response_type)
-      return res.status(500).send('response_type ' + response_type + ' must equal "code"');
+      return res
+        .status(500)
+        .send('response_type ' + response_type + ' must equal "code"');
 
     const client = {
-      gateway      : `https://${domain}.mozilla-iot.org`,
-      client_id    : client_id,
+      gateway: `https://${domain}.mozilla-iot.org`,
+      client_id: client_id,
       client_secret: client_secret,
-      redirect_uri : redirect_uri,
+      redirect_uri: redirect_uri,
     };
 
     try {
@@ -72,12 +74,12 @@ function registerAuth(app) {
 
     const gatewayUrl = url.format({
       pathname: client.gateway + '/oauth/authorize',
-      query   : {
-        client_id    : client.client_id,
-        redirect_uri : `https://${req.hostname}/allow`,
+      query: {
+        client_id: client.client_id,
+        redirect_uri: `https://${req.hostname}/allow`,
         response_type: response_type,
-        state        : state,
-        scope        : scope,
+        state: state,
+        scope: scope,
       },
     });
 
@@ -89,12 +91,16 @@ function registerAuth(app) {
     const code = req.query.code;
     const state = req.query.state;
 
-    if (!code || !state)
-      return res.status(400).send('authorization failed');
+    if (!code || !state) return res.status(400).send('authorization failed');
 
     const client = await datastore.getGatewayByState(state);
 
-    if (!client || !client.client_id || !client.client_secret || !client.redirect_uri) {
+    if (
+      !client ||
+      !client.client_id ||
+      !client.client_secret ||
+      !client.redirect_uri
+    ) {
       console.error('have not connect gateway');
       return res.status(400).send('have not connect gateway');
     }
@@ -107,9 +113,9 @@ function registerAuth(app) {
 
     const gatewayUrl = url.format({
       pathname: client.redirect_uri,
-      query   : {
+      query: {
         state: state,
-        code : code,
+        code: code,
       },
     });
 
@@ -131,16 +137,20 @@ function registerAuth(app) {
       return res.status(400).send('missing required parameter');
     }
 
-    if (client_id !== config.clientId ||
+    if (
+      client_id !== config.clientId ||
       client_secret !== config.clientSecret ||
-      redirect_uri !== config.redirectUrl) {
+      redirect_uri !== config.redirectUrl
+    ) {
       console.error('incorrect client data');
       return res.status(400).send('incorrect client data');
     }
 
     const client = await datastore.getGatewayByState(code);
     DEBUG && console.log('client', client);
-    var userPassB64 = new Buffer(`${client.client_id}:${client.client_secret}`).toString('base64');
+    var userPassB64 = new Buffer(
+      `${client.client_id}:${client.client_secret}`
+    ).toString('base64');
 
     if (!client || !client.client_id || !client.client_secret) {
       console.error('have not connect gateway');
@@ -154,12 +164,13 @@ function registerAuth(app) {
     }
 
     const options = {
-      method : 'POST',
+      method: 'POST',
       headers: {
-        'Content-Type' : 'application/x-www-form-urlencoded',
-        'authorization': 'Basic ' + userPassB64,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        authorization: 'Basic ' + userPassB64,
       },
-      body: `code=${code}&` +
+      body:
+        `code=${code}&` +
         `client_id=${client.client_id}&` +
         `client_secret=${client.client_secret}&` +
         `redirect_uri=${encodeURIComponent(`https://${req.hostname}/allow`)}&` +
@@ -167,7 +178,10 @@ function registerAuth(app) {
     };
 
     try {
-      const resp = await fetch(util.format('%s/oauth/token', client.gateway), options);
+      const resp = await fetch(
+        util.format('%s/oauth/token', client.gateway),
+        options
+      );
       const json = await resp.json();
 
       if (json.error) {

@@ -19,43 +19,50 @@ function createApp(config) {
   const app = express();
   app.use(morgan('dev'));
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.set('trust proxy', 1);
-  app.use(session({
-    name             : '__session',
-    secret           : 'xyzsecret',
-    resave           : false,
-    saveUninitialized: true,
-    cookie           : {secure: false},
-  }));
+  app.use(
+    session({
+      name: '__session',
+      secret: 'xyzsecret',
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: false },
+    })
+  );
 
   app.listen(config.devPort, function() {
     if (!config.isLocal) {
       return;
     }
     scheduler.createDashboard(app);
-    ngrok.connect(config.devPort, function(err, url) {
-      if (err) {
-        console.log('ngrok err', err);
-        process.exit();
+    ngrok.connect(
+      config.devPort,
+      function(err, url) {
+        if (err) {
+          console.log('ngrok err', err);
+          process.exit();
+        }
+
+        console.log('|###################################################|');
+        console.log('|                                                   |');
+        console.log('|        COPY & PASTE NGROK URL BELOW:              |');
+        console.log('|                                                   |');
+        console.log('|          ' + url + '                |');
+        console.log('|                                                   |');
+        console.log('|###################################################|');
+
+        console.log('=====');
+        console.log(
+          'Visit the Actions on Google console at http://console.actions.google.com'
+        );
+        console.log('Replace the webhook URL in the Actions section with:');
+        console.log('    ' + url + '/smarthome');
+        console.log('');
+
+        console.log("Finally press the 'TEST DRAFT' button");
       }
-
-      console.log('|###################################################|');
-      console.log('|                                                   |');
-      console.log('|        COPY & PASTE NGROK URL BELOW:              |');
-      console.log('|                                                   |');
-      console.log('|          ' + url + '                |');
-      console.log('|                                                   |');
-      console.log('|###################################################|');
-
-      console.log('=====');
-      console.log('Visit the Actions on Google console at http://console.actions.google.com');
-      console.log('Replace the webhook URL in the Actions section with:');
-      console.log('    ' + url + '/smarthome');
-      console.log('');
-
-      console.log('Finally press the \'TEST DRAFT\' button');
-    });
+    );
   });
 
   return app;

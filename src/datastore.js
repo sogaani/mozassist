@@ -36,8 +36,7 @@ class Database {
   /**
    * Do anything necessary to migrate from old database schemas.
    */
-  static migrate() {
-  }
+  static migrate() {}
 
   /**
    * Populate the database with default data.

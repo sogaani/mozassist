@@ -15,4 +15,4 @@ Object.keys(config).forEach(function(key) {
   args.push(`${key}=${value}`);
 });
 
-child_process.spawnSync('heroku', args, {stdio: 'inherit'});
+child_process.spawnSync('heroku', args, { stdio: 'inherit' });

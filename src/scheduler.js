@@ -6,17 +6,17 @@ const EventEmitter = require('events');
 const agendash = require('agendash');
 const DB_COLLECTION = 'jobs';
 
-const dboptions = {
-};
+const dboptions = {};
 
 class Scheduler extends EventEmitter {
   constructor() {
     super();
     this.agenda = new Agenda({
       db: {
-        address   : config.mongodb.uri,
+        address: config.mongodb.uri,
         collection: DB_COLLECTION,
-        options   : dboptions},
+        options: dboptions,
+      },
     });
     this.isReady = false;
     this.agenda.once('ready', () => {
@@ -31,11 +31,15 @@ class Scheduler extends EventEmitter {
 
   registerWorker(name, limit, worker) {
     limit = limit || 1;
-    this.agenda.define(name, {
-      concurrency : limit,
-      lockLimit   : limit,
-      lockLifetime: 5 * 60 * 1000,
-    }, worker);
+    this.agenda.define(
+      name,
+      {
+        concurrency: limit,
+        lockLimit: limit,
+        lockLifetime: 5 * 60 * 1000,
+      },
+      worker
+    );
   }
 
   _ifReady(cb) {
@@ -67,8 +71,9 @@ class Scheduler extends EventEmitter {
     this._ifReady(() => {
       data.jobId = jobId;
       const job = this.agenda.create(name, data);
-      const schedule = option && option.schedule ? option.schedule : '5 minutes';
-      job.unique({'data.jobId': jobId});
+      const schedule =
+        option && option.schedule ? option.schedule : '5 minutes';
+      job.unique({ 'data.jobId': jobId });
       job.repeatEvery(schedule);
       job.save();
     });
@@ -76,7 +81,7 @@ class Scheduler extends EventEmitter {
 
   cancelJob(name, jobId) {
     this._ifReady(() => {
-      this.agenda.cancel({'data.jobId': jobId});
+      this.agenda.cancel({ 'data.jobId': jobId });
     });
   }
 }

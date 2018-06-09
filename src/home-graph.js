@@ -2,7 +2,7 @@
 
 const fetch = require('node-fetch');
 const config = require('./config-provider');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
 const requestSyncEndpoint =
   'https://homegraph.googleapis.com/v1/devices:requestSync?key=';
@@ -14,7 +14,7 @@ const DEBUG = true;
 async function requestSync(id) {
   // REQUEST_SYNC
   const options = {
-    method : 'POST',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -47,16 +47,16 @@ async function reportState(id, requestId, states) {
   try {
     const tokens = await jwtClient.authorize();
     const options = {
-      method : 'POST',
+      method: 'POST',
       headers: {
-        'Content-Type' : 'application/json',
-        'Authorization': ` Bearer ${tokens.access_token}`,
+        'Content-Type': 'application/json',
+        Authorization: ` Bearer ${tokens.access_token}`,
       },
     };
     const optBody = {
-      requestId  : requestId,
+      requestId: requestId,
       agentUserId: id,
-      payload    : {
+      payload: {
         devices: {
           states: states,
         },
@@ -72,18 +72,24 @@ async function reportState(id, requestId, states) {
 
     const body = await response.json();
 
-    if (body && body.error && body.error.message === 'Requested entity was not found.') {
+    if (
+      body &&
+      body.error &&
+      body.error.message === 'Requested entity was not found.'
+    ) {
       isDisconnected = true;
     }
 
     if (DEBUG) {
-      console.log(`POST REPORT_STATE: response:${body} status:${response.status}`);
+      console.log(
+        `POST REPORT_STATE: response:${body} status:${response.status}`
+      );
     }
   } catch (e) {
     console.error('POST REPORT_STATE: failed', e);
   }
 
-  return {isDisconnected};
+  return { isDisconnected };
 }
 
 exports.requestSync = requestSync;

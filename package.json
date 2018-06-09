@@ -43,6 +43,8 @@
   "devDependencies": {
     "babel-eslint": "^8.2.2",
     "eslint": "^4.19.0",
-    "eslint-plugin-html": "^4.0.2"
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-html": "^4.0.2",
+    "eslint-plugin-prettier": "^2.6.0"
   }
 }
