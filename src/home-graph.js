@@ -42,6 +42,14 @@ async function reportState(id, requestId, states) {
     null
   );
 
+  const reportStates = {};
+
+  Object.keys(states).forEach(key => {
+    if (states[key].online) {
+      reportStates[key] = states[key];
+    }
+  });
+
   let isDisconnected = false;
 
   try {
@@ -58,7 +66,7 @@ async function reportState(id, requestId, states) {
       agentUserId: id,
       payload: {
         devices: {
-          states: states,
+          states: reportStates,
         },
       },
     };
