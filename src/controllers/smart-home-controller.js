@@ -469,28 +469,45 @@ function registerAgent(app) {
           const {devices, query} = await smarthome.smartHomeExec(client, deviceIds, exec);
 
           reportState(gatewayToId(client.gateway), data.requestId, devices);
-          resolve({
-            ids      : deviceIds,
-            status   : 'SUCCESS',
-            states   : query,
-            errorCode: undefined,
+
+          const commands = [];
+          Object.keys(devices).forEach(function(deviceId) {
+            if (devices[deviceId].online) {
+              commands.push({
+                ids      : [deviceId],
+                status   : 'SUCCESS',
+                states   : devices[deviceId],
+                errorCode: undefined,
+              });
+            } else {
+              commands.push({
+                ids      : [deviceId],
+                status   : 'OFFLINE',
+                states   : devices[deviceId],
+                errorCode: undefined,
+              });
+            }
           });
+          resolve(commands);
         } catch (error) {
           console.error(error);
 
-          resolve({
+          resolve([{
             ids   : deviceIds,
             status: 'OFFLINE',
             states: {
               online: false,
             },
             errorCode: error,
-          });
+          }]);
         }
       });
     });
 
-    const respCommands = await Promise.all(promises);
+    const results = await Promise.all(promises);
+    const respCommands = results.reduce((accumulator, currentValue)=>{
+      return accumulator.concat(currentValue);
+    });
 
     const resBody = {
       requestId: data.requestId,

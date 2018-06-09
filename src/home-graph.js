@@ -70,7 +70,7 @@ async function reportState(id, requestId, states) {
 
     const response = await fetch(reportStateEndpoint, options);
 
-    const body = await response.text();
+    const body = await response.json();
 
     if (body && body.error && body.error.message === 'Requested entity was not found.') {
       isDisconnected = true;

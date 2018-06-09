@@ -31,9 +31,9 @@ function getSmartHomeDeviceProperties(gateway, thing) {
     type  : null,
     traits: [],
     name  : {
-    // defaultNames: [thing.name],
+      // defaultNames: [thing.name],
       name: thing.name,
-    // nicknames: [thing.name]
+      // nicknames: [thing.name]
     },
     willReportState: true,
     attributes     : {},
@@ -85,9 +85,9 @@ function getSmartHomeDeviceProperties(gateway, thing) {
     device.attributes['colorModel'] = 'rgb';
     break;
   case 'thing':
-  // thermostat
+    // thermostat
     if (thing.properties.hasOwnProperty('mode') &&
-      thing.properties.hasOwnProperty('temperature')) {
+        thing.properties.hasOwnProperty('temperature')) {
       device.type = TYPE_THERMOSTAT;
       device.traits.push(TRAITS_TEMPSETTING);
       device.attributes['availableThermostatModes'] = 'off,heat,cool,on';
@@ -95,7 +95,7 @@ function getSmartHomeDeviceProperties(gateway, thing) {
     }
     break;
   default:
-  // do nothing
+    // do nothing
     break;
   }
 
@@ -103,38 +103,47 @@ function getSmartHomeDeviceProperties(gateway, thing) {
 }
 
 async function changeSmartHomeDeviceStates(gateway, thing, states) {
+  const currentStates = {};
   try {
+    currentStates.online = true;
     switch (thing.type) {
     case 'onOffSwitch':
     case 'multilevelSwitch': // limitation: only support on property
     case 'smartPlug': // limitation: only support on property
     case 'onOffLight':
       if (states.hasOwnProperty('on'))
-        await gateway.setThingState(thing, 'on', states['on']);
+        currentStates.on = await gateway.setThingState(thing, 'on', states['on']);
 
       break;
 
     case 'dimmableLight':
       if (states.hasOwnProperty('on'))
-        await gateway.setThingState(thing, 'on', states['on']);
+        currentStates.on = await gateway.setThingState(thing, 'on', states['on']);
 
       if (states.hasOwnProperty('brightness'))
-        await gateway.setThingState(thing, 'level', states['brightness']);
+        currentStates.brightness = await gateway.setThingState(
+          thing,
+          'level',
+          states['brightness']);
 
       if (states.hasOwnProperty('brightnessRelativeWeight')) {
         const current = await gateway.getThingState(thing, 'level');
         const target = current + states['brightnessRelativeWeight'];
-        await gateway.setThingState(thing, 'level', target);
+        currentStates.brightness = await gateway.setThingState(thing, 'level', target);
       }
       break;
 
     case 'onOffColorLight':
       if (states.hasOwnProperty('on'))
-        await gateway.setThingState(thing, 'on', states['on']);
+        currentStates.on = await gateway.setThingState(thing, 'on', states['on']);
 
-      if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
+      if (states.hasOwnProperty('color') &&
+          states.color.hasOwnProperty('spectrumRGB')) {
         const color = number2hex(states['color'].spectrumRGB);
-        await gateway.setThingState(thing, 'color', color);
+        const hex = await gateway.setThingState(thing, 'color', color);
+        currentStates.color = {
+          spectrumRGB: hex2number(hex),
+        };
       }
       break;
 
@@ -150,35 +159,45 @@ async function changeSmartHomeDeviceStates(gateway, thing, states) {
         const target = current + states['brightnessRelativeWeight'];
         await gateway.setThingState(thing, 'level', target);
       }
-      if (states.hasOwnProperty('color') && states['color'].spectrumRGB) {
+      if (states.hasOwnProperty('color') &&
+          states.color.hasOwnProperty('spectrumRGB')) {
         const color = number2hex(states['color'].spectrumRGB);
-        await gateway.setThingState(thing, 'color', color);
+        const hex = await gateway.setThingState(thing, 'color', color);
+        currentStates.color = {
+          spectrumRGB: hex2number(hex),
+        };
       }
       break;
 
     case 'thing':
-    // thermostat
+      // thermostat
       if (thing.properties.hasOwnProperty('mode') &&
-        thing.properties.hasOwnProperty('temperature')) {
+          thing.properties.hasOwnProperty('temperature')) {
         if (states.hasOwnProperty('thermostatMode'))
-          await gateway.setThingState(thing, 'mode', states['thermostatMode']);
+          currentStates.thermostatMode = await gateway.setThingState(
+            thing,
+            'mode',
+            states['thermostatMode']);
 
         if (states.hasOwnProperty('thermostatTemperatureSetpoint')) {
           const temperature = states['thermostatTemperatureSetpoint'];
-          await gateway.setThingState(thing, 'temperature', temperature);
+          currentStates.thermostatTemperatureSetpoint = await gateway.setThingState(
+            thing,
+            'temperature',
+            temperature);
         }
       }
       break;
     default:
-    // do nothing
+      // do nothing
       break;
     }
   } catch (err) {
     console.error('changeSmartHomeDeviceStates fail:', err);
-    states.online = false;
+    currentStates.online = false;
   }
 
-  return states;
+  return currentStates;
 }
 
 async function getSmartHomeDeviceStates(gateway, thing) {
@@ -244,9 +263,9 @@ async function getSmartHomeDeviceStates(gateway, thing) {
       break;
 
     case 'thing':
-    // thermostat
+      // thermostat
       if (thing.properties.hasOwnProperty('mode') &&
-        thing.properties.hasOwnProperty('temperature')) {
+          thing.properties.hasOwnProperty('temperature')) {
         const [mode, temperature] = await Promise.all([
           gateway.getThingState(thing, 'mode'),
           gateway.getThingState(thing, 'temperature'),
@@ -257,7 +276,7 @@ async function getSmartHomeDeviceStates(gateway, thing) {
       }
       break;
     default:
-    // do nothing
+      // do nothing
       break;
     }
   } catch (err) {
