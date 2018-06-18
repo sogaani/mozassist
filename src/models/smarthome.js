@@ -10,6 +10,10 @@ const TRAITS_COLORSPEC = 'action.devices.traits.ColorSpectrum';
 const TRAITS_TEMPSETTING = 'action.devices.traits.TemperatureSetting';
 
 const Gateway = require('./gateway');
+const config = require('./config-provider');
+
+const pollingDeviceProperty =
+  config.hasOwnProperty('mongodb') && config.mongodb.hasOwnProperty('uri');
 
 function hex2number(colorString) {
   const color = colorString.replace('#', '');
@@ -34,7 +38,7 @@ function getSmartHomeDeviceProperties(gateway, thing) {
       name: thing.name,
       // nicknames: [thing.name]
     },
-    willReportState: true,
+    willReportState: pollingDeviceProperty,
     attributes: {},
     deviceInfo: {
       manufacturer: 'mozilla',

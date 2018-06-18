@@ -11,6 +11,12 @@ const dboptions = {};
 class Scheduler extends EventEmitter {
   constructor() {
     super();
+    if (
+      config.hasOwnProperty('mongodb') &&
+      config.mongodb.hasOwnProperty('uri')
+    ) {
+      return;
+    }
     this.agenda = new Agenda({
       db: {
         address: config.mongodb.uri,
@@ -26,10 +32,16 @@ class Scheduler extends EventEmitter {
   }
 
   createDashboard(app) {
+    if (this.agenda === undefined) {
+      return;
+    }
     app.use('/dash', agendash(this.agenda));
   }
 
   registerWorker(name, limit, worker) {
+    if (this.agenda === undefined) {
+      return;
+    }
     limit = limit || 1;
     this.agenda.define(
       name,
@@ -53,12 +65,18 @@ class Scheduler extends EventEmitter {
   }
 
   startWorker() {
+    if (this.agenda === undefined) {
+      return;
+    }
     this._ifReady(() => {
       this.agenda.start();
     });
   }
 
   queueJob(name, data, option) {
+    if (this.agenda === undefined) {
+      return;
+    }
     this._ifReady(() => {
       const job = this.agenda.create(name, data);
       const schedule = option.schedule || '5 minutes';
@@ -68,6 +86,9 @@ class Scheduler extends EventEmitter {
   }
 
   repeatJob(name, jobId, data, option) {
+    if (this.agenda === undefined) {
+      return;
+    }
     this._ifReady(() => {
       data.jobId = jobId;
       const job = this.agenda.create(name, data);
@@ -80,6 +101,9 @@ class Scheduler extends EventEmitter {
   }
 
   cancelJob(name, jobId) {
+    if (this.agenda === undefined) {
+      return;
+    }
     this._ifReady(() => {
       this.agenda.cancel({ 'data.jobId': jobId });
     });
