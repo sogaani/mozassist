@@ -1,9 +1,10 @@
 const { smartHomeGetStates } = require('../models/smarthome');
 const { gatewayToId } = require('../utils');
-const { requestSync, reportState } = require('../home-graph');
+const { reportState } = require('../home-graph');
 
 const WORKER_NAME = 'stateReporter';
 
+/* The following code is intended for test. Delete when Report state bug fixed.
 function shouldSync(prevStates, currentStates) {
   let changed = false;
   Object.keys(prevStates).forEach(key => {
@@ -17,13 +18,13 @@ function shouldSync(prevStates, currentStates) {
   });
   return changed;
 }
+*/
 
 function registerWorker(scheduler) {
   scheduler.registerWorker(WORKER_NAME, 3, async (job, done) => {
     const client = job.attrs.data.client;
     const deviceIdList = job.attrs.data.deviceIdList;
     const requestId = 'mozassistRequest12398';
-    const prevStates = job.attrs.data.states;
     const id = gatewayToId(client.gateway);
     const currentStates = await smartHomeGetStates(client, deviceIdList);
     const { isDisconnected } = await reportState(id, requestId, currentStates);
@@ -34,6 +35,9 @@ function registerWorker(scheduler) {
       return;
     }
 
+    done();
+    /* The following code is intended for test. Delete when Report state bug fixed.
+    const prevStates = job.attrs.data.states;
     if (prevStates && shouldSync(prevStates, currentStates)) {
       await requestSync(id);
     }
@@ -42,6 +46,7 @@ function registerWorker(scheduler) {
     job.save(() => {
       done();
     });
+    */
   });
 }
 
