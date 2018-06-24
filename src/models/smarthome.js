@@ -10,7 +10,7 @@ const TRAITS_COLORSPEC = 'action.devices.traits.ColorSpectrum';
 const TRAITS_TEMPSETTING = 'action.devices.traits.TemperatureSetting';
 
 const Gateway = require('./gateway');
-const config = require('./config-provider');
+const config = require('../config-provider');
 
 const pollingDeviceProperty =
   config.hasOwnProperty('mongodb') && config.mongodb.hasOwnProperty('uri');
