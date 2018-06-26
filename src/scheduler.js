@@ -12,8 +12,9 @@ class Scheduler extends EventEmitter {
   constructor() {
     super();
     if (
-      config.hasOwnProperty('mongodb') &&
-      config.mongodb.hasOwnProperty('uri')
+      !(
+        config.hasOwnProperty('mongodb') && config.mongodb.hasOwnProperty('uri')
+      )
     ) {
       return;
     }
