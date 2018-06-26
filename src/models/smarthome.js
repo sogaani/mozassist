@@ -77,13 +77,17 @@ function getSmartHomeDeviceProperties(gateway, thing) {
     case 'onOffColorLight':
       device.type = TYPE_LIGHT;
       device.traits.push(TRAITS_ONOFF);
-      device.traits.push(TRAITS_COLORSPEC);
+      if (thing.properties.hasOwnProperty('color')) {
+        device.traits.push(TRAITS_COLORSPEC);
+      }
       device.attributes.colorModel = 'rgb';
       break;
     case 'dimmableColorLight':
       device.type = TYPE_LIGHT;
       device.traits.push(TRAITS_ONOFF);
-      device.traits.push(TRAITS_COLORSPEC);
+      if (thing.properties.hasOwnProperty('color')) {
+        device.traits.push(TRAITS_COLORSPEC);
+      }
       device.traits.push(TRAITS_BRIGHTNESS);
       device.attributes.colorModel = 'rgb';
       break;
@@ -274,35 +278,43 @@ async function getSmartHomeDeviceStates(gateway, thing) {
         break;
       case 'onOffColorLight':
         {
-          const [on, hex] = await Promise.all([
-            gateway.getThingState(thing, 'on'),
-            gateway.getThingState(thing, 'color'),
-          ]);
+          const promises = [];
+          promises.push(gateway.getThingState(thing, 'on'));
+          if (thing.properties.hasOwnProperty('color')) {
+            promises.push(gateway.getThingState(thing, 'color'));
+          }
+          const [on, hex] = await Promise.all(promises);
 
           states.on = on;
 
-          const color = {
-            spectrumRGB: hex2number(hex),
-          };
-          states.color = color;
+          if (hex) {
+            const color = {
+              spectrumRGB: hex2number(hex),
+            };
+            states.color = color;
+          }
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
       case 'dimmableColorLight':
         {
-          const [on, brightness, hex] = await Promise.all([
-            gateway.getThingState(thing, 'on'),
-            gateway.getThingState(thing, 'level'),
-            gateway.getThingState(thing, 'color'),
-          ]);
+          const promises = [];
+          promises.push(gateway.getThingState(thing, 'on'));
+          promises.push(gateway.getThingState(thing, 'level'));
+          if (thing.properties.hasOwnProperty('color')) {
+            promises.push(gateway.getThingState(thing, 'color'));
+          }
+          const [on, brightness, hex] = await Promise.all(promises);
 
           states.on = on;
           states.brightness = brightness;
 
-          const color = {
-            spectrumRGB: hex2number(hex),
-          };
-          states.color = color;
+          if (hex) {
+            const color = {
+              spectrumRGB: hex2number(hex),
+            };
+            states.color = color;
+          }
           states.online = await gateway.checkThingOnline(thing, 'on', on);
         }
         break;
