@@ -504,32 +504,36 @@ function registerAgent(app) {
 
       return new Promise(async resolve => {
         try {
-          const { devices } = await smarthome.smartHomeExec(
+          const { devicesStates } = await smarthome.smartHomeExec(
             client,
             deviceIds,
             exec
           );
 
-          reportState(gatewayToId(client.gateway), data.requestId, devices);
+          reportState(
+            gatewayToId(client.gateway),
+            data.requestId,
+            devicesStates
+          );
 
           const commands = [];
-          Object.keys(devices).forEach(function(deviceId) {
-            if (devices[deviceId].online) {
+          for (const deviceId in devicesStates) {
+            if (devicesStates[deviceId].online) {
               commands.push({
                 ids: [deviceId],
                 status: 'SUCCESS',
-                states: devices[deviceId],
+                states: devicesStates[deviceId],
                 errorCode: undefined,
               });
             } else {
               commands.push({
                 ids: [deviceId],
                 status: 'OFFLINE',
-                states: devices[deviceId],
+                states: devicesStates[deviceId],
                 errorCode: 'deviceOffline',
               });
             }
-          });
+          }
           resolve(commands);
         } catch (error) {
           console.error(error);

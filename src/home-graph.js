@@ -34,6 +34,11 @@ async function requestSync(id) {
 }
 
 async function reportState(id, requestId, states) {
+  if (!states) {
+    console.error(`POST REPORT_STATE: invalid states:${states}`);
+    return;
+  }
+
   const jwtClient = new google.auth.JWT(
     config.homeGraphServiceAccount.client_email,
     null,
