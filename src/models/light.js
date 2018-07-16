@@ -41,7 +41,7 @@ class Light extends Device {
     for (const name in this.description.properties) {
       const type = this.description.properties[name]['@type'];
 
-      if (type === 'BooleanProperty') {
+      if (type === 'OnOffProperty') {
         this.onProperty = name;
         break;
       } else if (
