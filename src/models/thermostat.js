@@ -32,7 +32,7 @@ class Thermostat extends Device {
   }
 
   async changeStates(states) {
-    const currentStates = {};
+    const currentStates = { online: true };
     try {
       if (states.hasOwnProperty('thermostatMode')) {
         currentStates.thermostatMode = await this.setState(

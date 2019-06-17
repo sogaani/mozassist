@@ -340,8 +340,11 @@ function registerAgent(app) {
     DEBUG &&
       console.log('sync response', JSON.stringify(deviceProps, undefined, 1));
 
-    response.status(200).json(deviceProps);
-    stateReporter.schedule(scheduler, client, deviceIdList);
+    await response.status(200).json(deviceProps);
+    setTimeout(() => {
+      stateReporter.schedule(scheduler, client, deviceIdList);
+    }, 10000);
+
     return;
   }
 

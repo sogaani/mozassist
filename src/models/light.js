@@ -78,7 +78,7 @@ class Light extends Device {
   }
 
   async changeStates(states) {
-    const currentStates = {};
+    const currentStates = { online: true };
     try {
       if (states.hasOwnProperty('on')) {
         currentStates.on = await this.setState(this.onProperty, states.on);

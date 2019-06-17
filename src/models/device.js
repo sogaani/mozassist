@@ -38,9 +38,22 @@ class Device {
 
     options.body = JSON.stringify(body);
 
-    const propertyUrl = `${this.gateway.url}${
-      this.description.properties[property].href
-    }`;
+    const propertyDescription = this.description.properties[property];
+    let href;
+    for (const link of propertyDescription.links) {
+      if (!link.rel || link.rel === 'property') {
+        href = link.href;
+        break;
+      }
+    }
+
+    if (href === 'undefined') {
+      throw new Error(
+        'thingDescription dose not have link to property: ' + property
+      );
+    }
+
+    const propertyUrl = `${this.gateway.url}${href}`;
 
     try {
       const res = await fetch(propertyUrl, options);
@@ -70,9 +83,22 @@ class Device {
       },
     };
 
-    const propertyUrl = `${this.gateway.url}${
-      this.description.properties[property].href
-    }`;
+    const propertyDescription = this.description.properties[property];
+    let href;
+    for (const link of propertyDescription.links) {
+      if (!link.rel || link.rel === 'property') {
+        href = link.href;
+        break;
+      }
+    }
+
+    if (href === 'undefined') {
+      throw new Error(
+        'thingDescription dose not have link to property: ' + property
+      );
+    }
+
+    const propertyUrl = `${this.gateway.url}${href}`;
 
     try {
       const res = await fetch(propertyUrl, options);
@@ -110,9 +136,22 @@ class Device {
 
     options.body = JSON.stringify(body);
 
-    const propertyUrl = `${this.gateway.url}${
-      this.description.properties[property].href
-    }`;
+    const propertyDescription = this.description.properties[property];
+    let href;
+    for (const link of propertyDescription.links) {
+      if (!link.rel || link.rel === 'property') {
+        href = link.href;
+        break;
+      }
+    }
+
+    if (href === 'undefined') {
+      throw new Error(
+        'thingDescription dose not have link to property: ' + property
+      );
+    }
+
+    const propertyUrl = `${this.gateway.url}${href}`;
 
     try {
       const res = await fetch(propertyUrl, options);
