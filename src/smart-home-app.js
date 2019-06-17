@@ -36,33 +36,30 @@ function createApp(config) {
       return;
     }
     scheduler.createDashboard(app);
-    ngrok.connect(
-      config.devPort,
-      function(err, url) {
-        if (err) {
-          console.log('ngrok err', err);
-          process.exit();
-        }
-
-        console.log('|###################################################|');
-        console.log('|                                                   |');
-        console.log('|        COPY & PASTE NGROK URL BELOW:              |');
-        console.log('|                                                   |');
-        console.log('|          ' + url + '                |');
-        console.log('|                                                   |');
-        console.log('|###################################################|');
-
-        console.log('=====');
-        console.log(
-          'Visit the Actions on Google console at http://console.actions.google.com'
-        );
-        console.log('Replace the webhook URL in the Actions section with:');
-        console.log('    ' + url + '/smarthome');
-        console.log('');
-
-        console.log("Finally press the 'TEST DRAFT' button");
+    ngrok.connect(config.devPort, function(err, url) {
+      if (err) {
+        console.log('ngrok err', err);
+        process.exit();
       }
-    );
+
+      console.log('|###################################################|');
+      console.log('|                                                   |');
+      console.log('|        COPY & PASTE NGROK URL BELOW:              |');
+      console.log('|                                                   |');
+      console.log('|          ' + url + '                |');
+      console.log('|                                                   |');
+      console.log('|###################################################|');
+
+      console.log('=====');
+      console.log(
+        'Visit the Actions on Google console at http://console.actions.google.com'
+      );
+      console.log('Replace the webhook URL in the Actions section with:');
+      console.log('    ' + url + '/smarthome');
+      console.log('');
+
+      console.log("Finally press the 'TEST DRAFT' button");
+    });
   });
 
   return app;
