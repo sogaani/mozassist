@@ -29,7 +29,7 @@
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "firebase-admin": "^5.13.1",
-    "googleapis": "^31.0.2",
+    "googleapis": "^39.1.0",
     "morgan": "^1.9.1",
     "ngrok": "^2.3.0",
     "node-fetch": "^1.6.3"
